@@ -8,6 +8,8 @@ El proyecto se encuentra en consolidacion de smoke y auditoria multi-IP. Los cas
 
 La explicacion tecnica de cada caso esta en `CASOS_DE_PRUEBA_RENDIMIENTO.md`.
 
+Convencion actual: para smoke se usan los alias cortos (`npm run smoke`, `npm run smoke:carnet`, `npm run smoke:grados`). Para escenarios especificos se usa `npm run perf:<servicio>:<escenario>`, por ejemplo `perf:carnet:audit` y `perf:grados:audit`. Los comandos genericos antiguos quedan solo como compatibilidad para Carnet.
+
 ## Comandos habilitados
 
 | Comando | Estado | Uso |
@@ -15,7 +17,7 @@ La explicacion tecnica de cada caso esta en `CASOS_DE_PRUEBA_RENDIMIENTO.md`.
 | `npm run smoke` | HABILITADO | Smoke mixto Carnet/Grados |
 | `npm run smoke:carnet` | HABILITADO | Smoke Carnet |
 | `npm run smoke:grados` | HABILITADO | Smoke Grados |
-| `npm run perf:audit` | HABILITADO | Auditoria multi-IP Carnet |
+| `npm run perf:carnet:audit` | HABILITADO | Auditoria multi-IP Carnet |
 | `npm run perf:grados:audit` | HABILITADO | Auditoria multi-IP Grados |
 | `npm run report:excel` | HABILITADO | Regenerar Excel desde ultimo JSON |
 | `npm run report:word` | HABILITADO | Regenerar Word desde ultimo JSON |
@@ -24,11 +26,11 @@ La explicacion tecnica de cada caso esta en `CASOS_DE_PRUEBA_RENDIMIENTO.md`.
 
 | Comando | Estado | Motivo |
 |---|---|---|
-| `npm run perf:cp02` | PENDIENTE | Falta cerrar baseline multi-IP y criterios finales |
-| `npm run perf:stress` | PENDIENTE | Requiere baseline estable previo |
-| `npm run perf:cp01` | PENDIENTE | Requiere ventana aprobada para validar WAF/rate limit |
-| `npm run perf:cp03` | PENDIENTE | Prueba extrema, requiere autorizacion operativa |
-| `npm run perf:collapse` | PENDIENTE | Colapso controlado de Carnet; requiere autorizacion operativa |
+| `npm run perf:carnet:cp02` | PENDIENTE | Falta cerrar baseline multi-IP y criterios finales |
+| `npm run perf:carnet:stress` | PENDIENTE | Requiere baseline estable previo |
+| `npm run perf:carnet:cp01` | PENDIENTE | Requiere ventana aprobada para validar WAF/rate limit |
+| `npm run perf:carnet:cp03` | PENDIENTE | Prueba extrema, requiere autorizacion operativa |
+| `npm run perf:carnet:collapse` | PENDIENTE | Colapso controlado de Carnet; requiere autorizacion operativa |
 | `npm run perf:all:collapse` | PENDIENTE | Colapso controlado mixto; requiere autorizacion operativa |
 | `npm run perf:grados:stress` | PENDIENTE | Stress ramping de Grados aun no consolidado |
 | `npm run perf:grados:cp01` | PENDIENTE | WAF limit de Grados requiere ventana autorizada |
@@ -43,8 +45,8 @@ El plan esta alineado con buenas practicas de rendimiento porque cubre:
 
 | Capa | Casos del plan | Estandar / practica cubierta |
 |---|---|---|
-| Smoke funcional | CP-GRA-02 y comandos smoke | ISTQB Performance Testing: validacion inicial antes de carga |
-| Baseline | CP-CAR-02 | Medicion base antes de stress; evita comparar sin linea base |
+| Smoke funcional | CP-CAR-00, CP-GRA-00 y CP-MIX-00 | ISTQB Performance Testing: validacion inicial antes de carga |
+| Baseline | CP-CAR-02, CP-GRA-02 | Medicion base antes de stress; evita comparar sin linea base |
 | Stress progresivo | CP-CAR-03, CP-GRA-03 | ISTQB: degradacion controlada bajo carga creciente |
 | Rate limit / WAF | CP-CAR-04, CP-GRA-04 | Fiabilidad y resiliencia ante rafagas |
 | Saturacion / breakpoint | CP-CAR-05, CP-GRA-05 | Busqueda de limite real, con aprobacion previa |
@@ -57,5 +59,5 @@ El plan esta alineado con buenas practicas de rendimiento porque cubre:
 3. Definir ventanas de ejecucion y aprobacion para CP-CAR-04/CP-GRA-04 y CP-CAR-05/CP-GRA-05.
 4. Indicar ambiente, version del API, datos usados y responsable de monitoreo.
 5. Agregar criterio de no afectacion: sin errores 5xx sostenidos, sin saturacion permanente y sin impacto a otros sistemas QA.
-6. Agregar a la matriz un smoke single-IP de Carnet para que ambos modulos tengan la misma puerta de entrada.
+6. Mantener `CP-CAR-00` y `CP-GRA-00` como puerta de entrada obligatoria antes de auditoria, baseline o stress.
 7. Agregar casos mixtos, spike y soak si se quiere cobertura completa de capacidad y resiliencia.

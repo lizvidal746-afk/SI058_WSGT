@@ -98,12 +98,22 @@ npm run smoke:carnet
 npm run smoke:grados
 
 # Auditoria multi-IP, cuando las IPs alias ya existen
-npm run perf:audit
+npm run perf:carnet:audit
 npm run perf:grados:audit
 
 # Load/stress/breakpoint/spike aun figuran como PENDIENTE.
-# Si se ejecutan, el proyecto devuelve un mensaje explicito de pendiente.
+# No ejecutarlos sin baseline aprobado, ventana autorizada y monitoreo backend.
 ```
+
+Los comandos smoke anteriores son los recomendados para uso diario. Internamente equivalen a:
+
+```powershell
+npm run perf:smoke
+npm run perf:carnet:smoke
+npm run perf:grados:smoke
+```
+
+Para escenarios especificos se usa la forma `perf:<servicio>:<escenario>`. Hoy los servicios activos son `carnet` y `grados`; si se agrega otro servicio, debe mantener la misma convencion.
 
 ### Colapso controlado
 
@@ -111,7 +121,7 @@ Los comandos de colapso son pruebas destructivas controladas. No deben ejecutars
 
 ```powershell
 # Colapsar solo Carnet
-npm run perf:collapse
+npm run perf:carnet:collapse
 
 # Colapsar solo Grados
 npm run perf:grados:collapse

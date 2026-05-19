@@ -92,7 +92,7 @@ export const options = {
 // Inyectar thresholds dinámicos por IP para forzar a k6 a exportar sub-métricas en el JSON final
 if (LOCAL_IPS && LOCAL_IPS.length > 1) {
   LOCAL_IPS.forEach(ip => {
-    options.thresholds[`http_req_duration{source_ip:${ip}}`] = ['p(95)>0'];
+    options.thresholds[`http_req_duration{source_ip:${ip}}`] = ['p(95)>=0'];
     options.thresholds[`http_req_failed{source_ip:${ip}}`]   = ['rate>=0']; 
     options.thresholds[`ttfb_ms{source_ip:${ip}}`]           = ['p(95)>=0'];
     options.thresholds[`http_req_blocked{source_ip:${ip}}`]  = ['avg>=0'];

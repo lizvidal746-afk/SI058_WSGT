@@ -8,20 +8,28 @@ Directorio oficial de ejecucion: `SI058_K6_STRESS`.
 
 Los comandos `npm run ...` de este documento deben ejecutarse desde ese directorio, porque ahi viven `.env`, `tools/`, `scripts/` y `reports/`.
 
+Convencion de comandos por servicio:
+
+- Para smoke se documentan los alias cortos: `npm run smoke`, `npm run smoke:carnet`, `npm run smoke:grados`.
+- Para escenarios especificos se usa el patron escalable `npm run perf:<servicio>:<escenario>`.
+- Servicios actuales: `carnet` y `grados`. Si aparece un tercer servicio, debe seguir la misma forma: `perf:<nuevo-servicio>:smoke`, `perf:<nuevo-servicio>:audit`, `perf:<nuevo-servicio>:cp02`, etc.
+- Los comandos genericos antiguos (`perf:audit`, `perf:cp02`, `perf:stress`, etc.) quedan solo como compatibilidad y apuntan a Carnet.
+
 ## Catalogo completo de ejecucion
 
 | ID | Modulo | Tipo | Comando |
 |---|---|---|---|
-| CP-CAR-00 | Carnet | Smoke | `npm run perf:carnet:smoke` |
-| CP-CAR-01 | Carnet | Auditoria multi-IP | `npm run perf:audit` |
-| CP-CAR-02 | Carnet | Baseline/load | `npm run perf:cp02` |
-| CP-CAR-03 | Carnet | Stress ramping | `npm run perf:stress` |
-| CP-CAR-04 | Carnet | WAF/rate limit | `npm run perf:cp01` |
-| CP-CAR-05 | Carnet | Breakpoint extremo | `npm run perf:cp03` |
-| CP-CAR-06 | Carnet | Collapse | `npm run perf:collapse` |
-| CP-CAR-07 | Carnet | Spike | `npm run perf:spike` |
-| CP-CAR-08 | Carnet | Soak/endurance | `npm run perf:soak` |
-| CP-GRA-00 | Grados | Smoke | `npm run perf:grados:smoke` |
+| CP-MIX-00 | Carnet + Grados | Smoke mixto | `npm run smoke` |
+| CP-CAR-00 | Carnet | Smoke | `npm run smoke:carnet` |
+| CP-CAR-01 | Carnet | Auditoria multi-IP | `npm run perf:carnet:audit` |
+| CP-CAR-02 | Carnet | Baseline/load | `npm run perf:carnet:cp02` |
+| CP-CAR-03 | Carnet | Stress ramping | `npm run perf:carnet:stress` |
+| CP-CAR-04 | Carnet | WAF/rate limit | `npm run perf:carnet:cp01` |
+| CP-CAR-05 | Carnet | Breakpoint extremo | `npm run perf:carnet:cp03` |
+| CP-CAR-06 | Carnet | Collapse | `npm run perf:carnet:collapse` |
+| CP-CAR-07 | Carnet | Spike | `npm run perf:carnet:spike` |
+| CP-CAR-08 | Carnet | Soak/endurance | `npm run perf:carnet:soak` |
+| CP-GRA-00 | Grados | Smoke | `npm run smoke:grados` |
 | CP-GRA-01 | Grados | Auditoria multi-IP | `npm run perf:grados:audit` |
 | CP-GRA-02 | Grados | Baseline/load | `npm run perf:grados:cp02` |
 | CP-GRA-03 | Grados | Stress ramping | `npm run perf:grados:stress` |
@@ -51,13 +59,33 @@ Los comandos `npm run ...` de este documento deben ejecutarse desde ese director
 | TTFB | Registrar promedio y p95 | Distingue backend/BD de red |
 | Evidencia | HTML, JSON, CSV, Excel y Word | Trazabilidad de auditoria |
 
+## CP-CAR-00 - Smoke Baseline Single IP Carnet
+
+Objetivo: validar rapidamente conectividad, credenciales, payload y respuesta funcional del endpoint de Carnet.
+
+Tipo: smoke single-IP.
+
+Comando actual: `npm run smoke:carnet`.
+
+Equivalente tecnico: `npm run perf:carnet:smoke`.
+
+Criterio de salida:
+
+- 4 iteraciones completadas.
+- p95 < 1500 ms.
+- Error rate < 1%.
+- Checks >= 99%.
+- Sin errores 5xx.
+
+Estado actual: habilitado.
+
 ## CP-CAR-01 - Auditoria Forense Multi-IP Carnet
 
 Objetivo: verificar que el endpoint de Carnet responda correctamente desde 10 IPs de origen y que la trazabilidad por IP no se pierda.
 
 Tipo: audit / smoke extendido multi-IP.
 
-Comando actual: `npm run perf:audit`.
+Comando actual: `npm run perf:carnet:audit`.
 
 Precondiciones:
 
@@ -82,7 +110,7 @@ Objetivo: establecer una linea base de comportamiento con usuarios e IPs multipl
 
 Tipo: baseline / load controlado.
 
-Comando planificado: `npm run perf:cp02`.
+Comando planificado: `npm run perf:carnet:cp02`.
 
 Precondiciones:
 
@@ -107,7 +135,7 @@ Objetivo: validar degradacion controlada al incrementar la concurrencia hasta 50
 
 Tipo: stress ramping.
 
-Comando planificado: `npm run perf:stress`.
+Comando planificado: `npm run perf:carnet:stress`.
 
 Criterio de salida:
 
@@ -124,7 +152,7 @@ Objetivo: comprobar si el gateway/WAF limita correctamente por IP sin impactar e
 
 Tipo: rate limit / resiliencia.
 
-Comando planificado: `npm run perf:cp01`.
+Comando planificado: `npm run perf:carnet:cp01`.
 
 Criterio de salida:
 
@@ -141,7 +169,7 @@ Objetivo: identificar el punto de quiebre real del backend/base de datos.
 
 Tipo: breakpoint / stress extremo.
 
-Comando planificado: `npm run perf:cp03`.
+Comando planificado: `npm run perf:carnet:cp03`.
 
 Criterio de salida:
 
@@ -158,7 +186,7 @@ Objetivo: provocar una ruptura rapida y controlada del endpoint Carnet para iden
 
 Tipo: collapse / breakpoint rapido.
 
-Comando planificado: `npm run perf:collapse`.
+Comando planificado: `npm run perf:carnet:collapse`.
 
 Precondiciones:
 
@@ -194,13 +222,15 @@ Criterio de salida:
 
 Estado actual: habilitado para fase smoke/auditoria.
 
-## CP-GRA-02 - Smoke Baseline Single IP Grados
+## CP-GRA-00 - Smoke Baseline Single IP Grados
 
 Objetivo: validar rapidamente conectividad, credenciales, payload y respuesta funcional del endpoint de Grados.
 
 Tipo: smoke single-IP.
 
-Comando actual: `npm run perf:grados:smoke`.
+Comando actual: `npm run smoke:grados`.
+
+Equivalente tecnico: `npm run perf:grados:smoke`.
 
 Criterio de salida:
 
@@ -211,6 +241,31 @@ Criterio de salida:
 - Sin errores 5xx.
 
 Estado actual: habilitado.
+
+## CP-GRA-02 - Carga Base Organica Multi-IP Grados
+
+Objetivo: establecer una linea base de comportamiento del endpoint Grados con usuarios e IPs multiples antes de stress.
+
+Tipo: baseline / load controlado.
+
+Comando planificado: `npm run perf:grados:cp02`.
+
+Precondiciones:
+
+- Smoke Grados aprobado.
+- Auditoria multi-IP Grados aprobada.
+- Usuarios/IPs documentados.
+- Ventana de prueba autorizada.
+
+Criterio de salida:
+
+- p95 < 1500 ms.
+- p99 < 2000 ms.
+- Error rate < 1%.
+- APDEX >= 0.90.
+- Sin errores 5xx.
+
+Estado actual: pendiente.
 
 ## CP-GRA-03 - Escalabilidad Multi-PC Grados
 
@@ -300,27 +355,26 @@ Estado actual: pendiente; prueba destructiva controlada.
 | Frente | Cubierto | Comentario |
 |--------|----------|------------|
 
-| Smoke funcional | Parcial | Grados esta explicito; falta agregar caso smoke single-IP de Carnet en la matriz |
+| Smoke funcional | Si | Cubierto por CP-CAR-00, CP-GRA-00 y CP-MIX-00 |
 | Auditoria multi-IP | Si | Cubierto para Carnet y Grados |
-| Baseline/load | Parcial | Existe CP-CAR-02; falta baseline equivalente para Grados si se requiere comparabilidad |
+| Baseline/load | Si | Cubierto como pendiente por CP-CAR-02 y CP-GRA-02 |
 | Stress ramping | Si | Cubierto para ambos modulos como pendiente |
 | Rate limit/WAF | Si | Cubierto para ambos modulos como pendiente |
 | Breakpoint/saturacion | Si | Cubierto para ambos modulos como pendiente |
 | Collapse rapido | Si | Cubierto por Carnet, Grados y mixto como prueba destructiva controlada |
-| Spike test | No | Falta caso de pico repentino y recuperacion |
-| Soak/endurance | No | Falta prueba sostenida para fugas, degradacion gradual o limites por hora |
+| Spike test | Si | Cubierto como pendiente por CP-CAR-07 y CP-GRA-07 |
+| Soak/endurance | Si | Cubierto como pendiente por CP-CAR-08 y CP-GRA-08 |
 | Recovery test | Parcial | Debe explicitarse recuperacion post-WAF/post-breakpoint |
 | Volumen/datos | Parcial | Hay CSVs, falta definir volumen minimo, distribucion y datos invalidos esperados |
 | Observabilidad backend | Parcial | Se mide k6; falta documentar CPU, memoria, DB, gateway, logs y dashboard asociado |
 
 ## Casos recomendados para completar la estrategia
 
-1. CP-CAR-00 - Smoke Baseline Single IP Carnet.
-2. CP-GRA-07 - Baseline Multi-IP Grados, si el servicio Grados requiere comparacion propia.
-3. CP-MIX-02 - Carga mixta Carnet/Grados con proporcion real de uso.
-4. CP-MIX-03 - Spike repentino y recuperacion.
-5. CP-MIX-04 - Soak de 30 a 60 minutos con carga moderada.
-6. CP-OBS-01 - Validacion de monitoreo: CPU, memoria, conexiones, DB, gateway, 429 y 5xx.
+1. Definir criterios finales de baseline para CP-CAR-02 y CP-GRA-02.
+2. CP-MIX-02 - Carga mixta Carnet/Grados con proporcion real de uso.
+3. CP-MIX-03 - Spike repentino y recuperacion.
+4. CP-MIX-04 - Soak de 30 a 60 minutos con carga moderada.
+5. CP-OBS-01 - Validacion de monitoreo: CPU, memoria, conexiones, DB, gateway, 429 y 5xx.
 
 ## Recomendacion profesional
 
