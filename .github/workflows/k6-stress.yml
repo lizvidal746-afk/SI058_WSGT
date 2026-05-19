@@ -1,0 +1,126 @@
+name: SI058 k6 Smoke/Audit (self-hosted)
+
+# ============================================================
+# Workflow profesional para correr k6 en self-hosted runner
+# desde tu PC, usando las 10 IPs locales 192.168.28.48-57.
+#
+# Pre-requisito: tu PC debe estar registrada como GitHub
+# self-hosted runner con label 'sunedu-pc-k6'.
+#
+# Secrets requeridos en el repo:
+#   SUNEDU_BASE_URL
+#   SUNEDU_USUARIO_1 / SUNEDU_CLAVE_1 / SUNEDU_DOC_1 / SUNEDU_ENTIDAD_1
+#   SUNEDU_USUARIO_2 / SUNEDU_CLAVE_2 / SUNEDU_DOC_2 / SUNEDU_ENTIDAD_2
+#   K6_LOCAL_IPS                  (opcional: solo IP DHCP ej. 192.168.28.8, o rango 48-57 si hay alias)
+#   K6_PROMETHEUS_RW_USERNAME
+#   K6_PROMETHEUS_RW_PASSWORD
+#   K6_PROMETHEUS_RW_SERVER_URL
+# ============================================================
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Tipo de prueba'
+        required: true
+        default: 'perf:smoke'
+        type: choice
+        options:
+          - perf:smoke
+          - perf:carnet:smoke
+          - perf:grados:smoke
+          - perf:audit
+          - perf:grados:audit
+      send_to_grafana:
+        description: 'Pendiente: enviar metricas a Grafana Cloud (Prometheus RW)'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  k6:
+    runs-on: [self-hosted, sunedu-pc-k6]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verificar IPs alias (no fallar si faltan, solo avisar)
+        shell: powershell
+        run: |
+          powershell -ExecutionPolicy Bypass -File SI058_K6_STRESS/tools/verify-ips.ps1
+
+      - name: Verificar k6 instalado
+        shell: powershell
+        run: |
+          k6 version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Instalar k6: winget install k6" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: Ejecutar prueba smoke/audit ${{ inputs.test_type }}
+        shell: powershell
+        env:
+          BASE_URL:                  ${{ secrets.SUNEDU_BASE_URL }}
+          K6_LOCAL_IPS:              ${{ secrets.K6_LOCAL_IPS }}
+          SUNEDU_USUARIO_1:          ${{ secrets.SUNEDU_USUARIO_1 }}
+          SUNEDU_CLAVE_1:            ${{ secrets.SUNEDU_CLAVE_1 }}
+          SUNEDU_DOC_1:              ${{ secrets.SUNEDU_DOC_1 }}
+          SUNEDU_ENTIDAD_1:          ${{ secrets.SUNEDU_ENTIDAD_1 }}
+          SUNEDU_USUARIO_2:          ${{ secrets.SUNEDU_USUARIO_2 }}
+          SUNEDU_CLAVE_2:            ${{ secrets.SUNEDU_CLAVE_2 }}
+          SUNEDU_DOC_2:              ${{ secrets.SUNEDU_DOC_2 }}
+          SUNEDU_ENTIDAD_2:          ${{ secrets.SUNEDU_ENTIDAD_2 }}
+          TEST_ID:                   ci-${{ github.run_number }}
+          ENVIRONMENT:               qa
+          TESTER:                    github-actions
+          CI:                        'true'
+          K6_WEB_DASHBOARD:          'true'
+          K6_WEB_DASHBOARD_PORT:     '-1'
+          K6_WEB_DASHBOARD_EXPORT:   reports/${{ inputs.test_type }}-ci-${{ github.run_number }}.html
+        run: |
+          cd SI058_K6_STRESS
+          New-Item -ItemType Directory -Force -Path reports | Out-Null
+          if ('${{ inputs.send_to_grafana }}' -eq 'true') {
+            Write-Error "Grafana/Prometheus esta marcado como PENDIENTE hasta cerrar smoke/load local."
+            exit 1
+          }
+
+          switch ('${{ inputs.test_type }}') {
+            'perf:smoke' {
+              $env:SCENARIO='smoke'
+              powershell -ExecutionPolicy Bypass -File tools/run-k6.ps1 scripts/performance.js -NoOpen -SkipAI
+            }
+            'perf:carnet:smoke' {
+              $env:SCENARIO='smoke'
+              powershell -ExecutionPolicy Bypass -File tools/run-k6.ps1 scripts/carnet.js -NoOpen -SkipAI
+            }
+            'perf:grados:smoke' {
+              $env:SCENARIO='smoke'
+              powershell -ExecutionPolicy Bypass -File tools/run-k6.ps1 scripts/grados.js -NoOpen -SkipAI
+            }
+            'perf:audit' {
+              $env:SCENARIO='multi_ip_audit'
+              powershell -ExecutionPolicy Bypass -File tools/run-k6.ps1 scripts/carnet.js -NoOpen -SkipAI
+            }
+            'perf:grados:audit' {
+              $env:SCENARIO='multi_ip_audit'
+              powershell -ExecutionPolicy Bypass -File tools/run-k6.ps1 scripts/grados.js -NoOpen -SkipAI
+            }
+            default {
+              Write-Error "Tipo de prueba pendiente/no soportado en esta fase: ${{ inputs.test_type }}"
+              exit 1
+            }
+          }
+
+      - name: Subir reportes como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-${{ inputs.test_type }}-run-${{ github.run_number }}
+          path: |
+            SI058_K6_STRESS/reports/*.html
+            SI058_K6_STRESS/reports/*.json
+          retention-days: 30
