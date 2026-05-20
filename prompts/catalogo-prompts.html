@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Prompts IA — SI058 K6 Performance</title>
+<meta name="description" content="Catálogo interactivo de prompts reutilizables para testing de rendimiento con k6, Node.js y PowerShell — SUNEDU SI058">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --accent: #2f81f7;
+    --accent2: #388bfd;
+    --green: #3fb950;
+    --orange: #d29922;
+    --purple: #bc8cff;
+    --pink: #ff7b72;
+    --teal: #39d353;
+    --card-hover: #21262d;
+    --tag-bg: #1f3358;
+    --tag-text: #79c0ff;
+    --copied: #238636;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 1rem; font-weight: 700; }
+  .logo-sub { font-size: 0.7rem; color: var(--text2); font-weight: 400; }
+  .header-search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+    margin-left: auto;
+  }
+  .header-search input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .header-search input:focus { border-color: var(--accent); }
+  .header-search .search-icon {
+    position: absolute; left: 0.75rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text2); font-size: 0.85rem;
+  }
+  .badge-count {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  /* LAYOUT */
+  .layout {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 70px);
+  }
+
+  /* SIDEBAR */
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+  }
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-section { margin-bottom: 1.5rem; }
+  .sidebar-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.83rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .sidebar-btn:hover { background: var(--card-hover); color: var(--text); }
+  .sidebar-btn.active {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-weight: 500;
+  }
+  .sidebar-btn .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sidebar-btn .cat-count {
+    margin-left: auto;
+    font-size: 0.7rem;
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 0.1rem 0.4rem;
+    color: var(--text2);
+  }
+  .sidebar-btn.active .cat-count {
+    background: rgba(47,129,247,0.2);
+    color: var(--tag-text);
+  }
+
+  /* MAIN */
+  main { padding: 1.5rem 2rem; }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .toolbar-title { font-size: 1.1rem; font-weight: 600; }
+  .toolbar-title span { color: var(--text2); font-weight: 400; font-size: 0.9rem; }
+  .sort-btn {
+    margin-left: auto;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sort-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(47,129,247,0.12);
+  }
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .card-meta { flex: 1; min-width: 0; }
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+  }
+  .card-category {
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  .card-desc {
+    font-size: 0.8rem;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .card-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+  }
+  .tag.green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag.orange { background: rgba(210,153,34,0.15); color: var(--orange); }
+  .tag.purple { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .tag.pink { background: rgba(255,123,114,0.15); color: var(--pink); }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .card-level {
+    font-size: 0.7rem;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .level-dots span {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .level-dots span.filled { background: var(--accent); }
+  .open-btn {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(1,4,9,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 760px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalIn 0.2s ease;
+  }
+  .modal::-webkit-scrollbar { width: 4px; }
+  .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg2);
+    z-index: 1;
+  }
+  .modal-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .modal-header-meta { flex: 1; }
+  .modal-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .modal-subtitle { font-size: 0.8rem; color: var(--text2); }
+  .modal-close {
+    background: none; border: none;
+    color: var(--text2);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+  .modal-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.5rem;
+  }
+  .modal-desc {
+    font-size: 0.85rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .prompt-block {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .prompt-block-header {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    gap: 0.5rem;
+  }
+  .prompt-block-header span {
+    font-size: 0.72rem;
+    color: var(--text2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .copy-btn {
+    margin-left: auto;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.25rem 0.65rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { background: rgba(35,134,54,0.15); border-color: var(--copied); color: var(--teal); }
+  .prompt-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: #c9d1d9;
+    padding: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .var-pill {
+    display: inline-block;
+    background: rgba(210,153,34,0.2);
+    color: var(--orange);
+    border: 1px solid rgba(210,153,34,0.3);
+    border-radius: 4px;
+    padding: 0 0.25rem;
+    font-size: 0.75em;
+  }
+  .vars-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .var-row {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .var-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--orange);
+  }
+  .var-desc { font-size: 0.75rem; color: var(--text2); }
+  .tips-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .tips-list li {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .tips-list li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .modal-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  /* EMPTY */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text2);
+  }
+  .empty .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .empty h3 { font-size: 1rem; color: var(--text); margin-bottom: 0.5rem; }
+
+  /* TOOLTIP placeholder highlight */
+  .prompt-text .ph { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">Catálogo de Prompts IA</div>
+        <div class="logo-sub">SI058 · K6 Performance · SUNEDU</div>
+      </div>
+    </div>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input id="searchInput" type="text" placeholder="Buscar prompts..." autocomplete="off">
+    </div>
+    <div class="badge-count" id="totalBadge">20 prompts</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Categorías</div>
+      <button class="sidebar-btn active" data-cat="all" id="btn-all">
+        <span class="dot" style="background:#2f81f7"></span>
+        Todos los prompts
+        <span class="cat-count" id="cnt-all">20</span>
+      </button>
+      <button class="sidebar-btn" data-cat="framework">
+        <span class="dot" style="background:#bc8cff"></span>
+        Framework &amp; Teoría
+        <span class="cat-count" id="cnt-framework">4</span>
+      </button>
+      <button class="sidebar-btn" data-cat="analisis">
+        <span class="dot" style="background:#2f81f7"></span>
+        Análisis IA
+        <span class="cat-count" id="cnt-analisis">5</span>
+      </button>
+      <button class="sidebar-btn" data-cat="codigo">
+        <span class="dot" style="background:#3fb950"></span>
+        Revisión de Código
+        <span class="cat-count" id="cnt-codigo">3</span>
+      </button>
+      <button class="sidebar-btn" data-cat="thresholds">
+        <span class="dot" style="background:#d29922"></span>
+        Thresholds &amp; Config
+        <span class="cat-count" id="cnt-thresholds">3</span>
+      </button>
+      <button class="sidebar-btn" data-cat="debug">
+        <span class="dot" style="background:#ff7b72"></span>
+        Debug &amp; CSV
+        <span class="cat-count" id="cnt-debug">2</span>
+      </button>
+      <button class="sidebar-btn" data-cat="collapse">
+        <span class="dot" style="background:#ff7b72"></span>
+        Stress &amp; Collapse
+        <span class="cat-count" id="cnt-collapse">3</span>
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Nivel</div>
+      <button class="sidebar-btn" data-level="1">
+        <span class="dot" style="background:#3fb950"></span>
+        Básico
+      </button>
+      <button class="sidebar-btn" data-level="2">
+        <span class="dot" style="background:#d29922"></span>
+        Intermedio
+      </button>
+      <button class="sidebar-btn" data-level="3">
+        <span class="dot" style="background:#ff7b72"></span>
+        Avanzado
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Modo</div>
+      <button class="sidebar-btn" data-mode="reutilizable">
+        <span>🔁</span> Solo reutilizables
+      </button>
+      <button class="sidebar-btn" data-mode="formacion">
+        <span>📚</span> Solo formación
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-title" id="sectionTitle">Todos los prompts <span id="resultCount"></span></div>
+      <button class="sort-btn" id="sortBtn">Ordenar: Categoría ↕</button>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-header-meta">
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-subtitle" id="modalSubtitle"></div>
+      </div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const PROMPTS = [
+  // ── FRAMEWORK & TEORÍA ──────────────────────────────────────────
+  {
+    id: 1,
+    title: "Framework universal de prompts",
+    category: "framework",
+    mode: "formacion",
+    level: 1,
+    icon: "🏗️",
+    color: "#bc8cff",
+    iconBg: "rgba(188,140,255,0.15)",
+    desc: "Estructura universal de 6 componentes para construir cualquier prompt. Incluye plantilla vacía y ejemplo aplicado a QA de rendimiento.",
+    tags: ["teoría", "plantilla", "framework"],
+    tagStyle: "purple",
+    prompt: `Actúa como experto en prompt engineering con experiencia enseñando a equipos técnicos de QA y desarrollo.
+
+Contexto: Soy tester de rendimiento, uso k6, Node.js y PowerShell. Quiero mejorar cómo le pido cosas a la IA en mi trabajo diario.
+
+Tarea: Enséñame tu framework para construir prompts efectivos. Incluye:
+- La estructura universal (máximo 6 componentes)
+- Un ejemplo vacío como plantilla reutilizable
+- Un ejemplo completo aplicado a QA de rendimiento
+
+Formato: Primero la teoría en menos de 150 palabras, luego las plantillas en bloques de código.
+
+Restricción: Sin introducción genérica. Empieza directamente con el framework.`,
+    tips: [
+      "Envía primero este prompt para establecer las bases",
+      "Usa la respuesta como referencia al escribir nuevos prompts",
+      "El modelo recordará el framework si continúas en el mismo chat"
+    ]
+  },
+  {
+    id: 2,
+    title: "Los 5 errores graves al promptear",
+    category: "framework",
+    mode: "formacion",
+    level: 1,
+    icon: "⚠️",
+    color: "#ff7b72",
+    iconBg: "rgba(255,123,114,0.15)",
+    desc: "Los 5 errores más comunes de perfiles técnicos al escribir prompts. Con ejemplo malo, por qué falla y versión corregida.",
+    tags: ["errores", "corrección", "QA"],
+    tagStyle: "pink",
+    prompt: `Siguiendo el framework que me explicaste:
+
+Tarea: Dime los 5 errores más graves al escribir prompts, enfocados en perfiles técnicos (testers, devs).
+
+Por cada error incluye:
+1. Nombre del error
+2. Ejemplo real del error (prompt malo)
+3. Por qué falla
+4. Versión corregida del mismo prompt
+
+Restricción: Usa solo errores que hayas visto en contextos de automatización o QA. Nada genérico.`,
+    tips: [
+      "Encadena este prompt después del Prompt 1 para máxima coherencia",
+      "Guarda los 5 errores como checklist antes de enviar cualquier prompt"
+    ]
+  },
+  {
+    id: 3,
+    title: "Variables, placeholders e iteración",
+    category: "framework",
+    mode: "formacion",
+    level: 2,
+    icon: "🔁",
+    color: "#bc8cff",
+    iconBg: "rgba(188,140,255,0.15)",
+    desc: "Técnica de reutilización con {{variables}} e iteración progresiva en 3 rondas. Ejemplo sobre generación de código k6.",
+    tags: ["variables", "iteración", "k6"],
+    tagStyle: "purple",
+    prompt: `Contexto: Tengo prompts que repito frecuentemente para mi framework k6 (generar thresholds, validar CSV, revisar scripts).
+
+Tarea: Muéstrame cómo usar variables y placeholders para hacer esos prompts reutilizables. Luego explica la técnica de iteración progresiva con un ejemplo real de mejora en 3 rondas.
+
+Formato:
+- Sección 1: Plantilla con variables (usa sintaxis {{variable}})
+- Sección 2: Ejemplo de iteración con prompt inicial, resultado, ajuste y resultado mejorado
+
+Restricción: El ejemplo debe ser sobre generación de código k6 o Node.js.`,
+    tips: [
+      "Aplica la sintaxis {{variable}} a todos los prompts de este catálogo",
+      "Guarda 2-3 versiones iteradas de tus mejores prompts"
+    ]
+  },
+  {
+    id: 4,
+    title: "Ejercicios prácticos de prompting",
+    category: "framework",
+    mode: "formacion",
+    level: 2,
+    icon: "🎯",
+    color: "#2f81f7",
+    iconBg: "rgba(47,129,247,0.15)",
+    desc: "5 ejercicios de menor a mayor dificultad. Cada uno con situación real, prompt malo, prompt correcto y análisis de mejora.",
+    tags: ["ejercicios", "práctica", "k6", "QA"],
+    tagStyle: "blue",
+    prompt: `Tarea: Dame 5 ejercicios de prompting ordenados de menor a mayor dificultad, enfocados en tareas reales de QA performance con k6.
+
+Por cada ejercicio:
+- Nivel (1 al 5)
+- Situación real que lo motiva
+- El prompt "malo" típico
+- El prompt correcto con todos los elementos
+- Qué mejora concretamente y por qué
+
+Restricción: No incluyas ejercicios genéricos de redacción o marketing. Solo contexto técnico.`,
+    tips: [
+      "Resuelve un ejercicio por sesión para consolidar el aprendizaje",
+      "Comparte tus respuestas y pide feedback a la IA"
+    ]
+  },
+
+  // ── ANÁLISIS IA ─────────────────────────────────────────────────
+  {
+    id: 5,
+    title: "Análisis ejecutivo GO/NO-GO",
+    category: "analisis",
+    mode: "reutilizable",
+    level: 2,
+    icon: "📊",
+    color: "#2f81f7",
+    iconBg: "rgba(47,129,247,0.15)",
+    desc: "Evalúa si el sistema está listo para pasar de smoke a carga. Decisión GO/NO-GO con riesgos y próximos pasos.",
+    tags: ["ejecutivo", "GO/NO-GO", "SRE"],
+    tagStyle: "blue",
+    prompt: `Actúa como SRE senior y gerente de calidad.
+
+Analiza este resultado k6 de SI058. Evalúa si el sistema está listo para pasar de smoke/baseline a carga.
+
+Usa: p95, p99, error rate, APDEX, checks, TTFB, 429, 5xx y recuperación.
+
+Dame:
+1. Conclusión ejecutiva (máximo 3 párrafos)
+2. Riesgos identificados (priorizado por impacto)
+3. Decisión GO / NO-GO con justificación
+4. Próximos pasos concretos
+
+[PEGAR JSON/REPORTE K6 AQUÍ]
+
+Restricción: Sin tecnicismos innecesarios. El reporte debe ser entendible por un directivo no técnico.`,
+    tips: [
+      "Pega el contenido de reports/<RUN>/metrics_for_ai.json",
+      "Úsalo antes de escalar de smoke a load",
+      "Combínalo con el prompt técnico profundo para doble validación"
+    ]
+  },
+  {
+    id: 6,
+    title: "Análisis técnico profundo",
+    category: "analisis",
+    mode: "reutilizable",
+    level: 3,
+    icon: "🔬",
+    color: "#3fb950",
+    iconBg: "rgba(63,185,80,0.15)",
+    desc: "Identifica cuello de botella (cliente, red, WAF, backend, BD). Cruza p95, p99, TTFB, blocked, TLS, http_req_failed por IP.",
+    tags: ["cuellos-botella", "IP", "diagnóstico"],
+    tagStyle: "green",
+    prompt: `Actúa como ingeniero de rendimiento senior.
+
+Analiza el JSON/reporte de k6 de SI058. Identifica cuello de botella probable:
+cliente | red | WAF | backend | base de datos | datos de prueba
+
+Cruza estas métricas: p95, p99, TTFB, blocked, TLS, http_req_failed, status codes, checks y métricas por IP.
+
+Dame:
+1. Hipótesis priorizadas (de más a menos probable)
+2. Evidencias métricas que sustentan cada hipótesis
+3. Comandos o acciones para confirmar cada hipótesis
+
+[PEGAR REPORTE AQUÍ]
+
+Restricción: Basa cada hipótesis en datos del reporte. Nada especulativo sin evidencia.`,
+    tips: [
+      "Úsalo cuando hay degradación pero sin causa clara",
+      "Las métricas por IP están en el HTML de reportes/",
+      "Ejecuta después del análisis ejecutivo para mayor profundidad"
+    ]
+  },
+  {
+    id: 7,
+    title: "Comparación Carnet vs Grados",
+    category: "analisis",
+    mode: "reutilizable",
+    level: 2,
+    icon: "⚖️",
+    color: "#2f81f7",
+    iconBg: "rgba(47,129,247,0.15)",
+    desc: "Compara latencia, errores, APDEX, TTFB, throughput y comportamiento por IP entre ambos endpoints.",
+    tags: ["carnet", "grados", "comparación"],
+    tagStyle: "blue",
+    prompt: `Actúa como analista de rendimiento.
+
+Compara los resultados de Carnet y Grados en SI058.
+
+Evalúa:
+- Latencia (p50, p95, p99)
+- Tasas de error y tipos
+- APDEX y TTFB
+- Throughput (req/s)
+- Comportamiento por IP del pool
+- Estabilidad en el tiempo
+
+Identifica:
+1. Cuál endpoint degrada primero y en qué condiciones
+2. Qué evidencias métricas sustentan la conclusión
+3. Recomendación: ¿se pueden ejecutar juntos o separados?
+
+[PEGAR RESULTADOS DE AMBOS ENDPOINTS]
+
+Restricción: Presenta los datos en tabla comparativa siempre que sea posible.`,
+    tips: [
+      "Pega los JSON de carnet y grados en la misma solicitud",
+      "Útil antes de decidir si ejecutar las pruebas juntas o por separado"
+    ]
+  },
+  {
+    id: 8,
+    title: "Mejora del plan de pruebas",
+    category: "analisis",
+    mode: "reutilizable",
+    level: 2,
+    icon: "📋",
+    color: "#bc8cff",
+    iconBg: "rgba(188,140,255,0.15)",
+    desc: "Revisa la matriz de casos SI058. Cobertura faltante, duplicidades, orden recomendado y criterios de salida por caso.",
+    tags: ["ISTQB", "ISO 25010", "plan"],
+    tagStyle: "purple",
+    prompt: `Actúa como arquitecto de performance testing con experiencia en ISTQB, SRE e ISO/IEC 25010.
+
+Revisa esta matriz de casos SI058.
+
+Indica:
+1. Cobertura faltante (tipos de prueba no contemplados)
+2. Duplicidades (casos que prueban lo mismo)
+3. Riesgos en la secuencia actual
+4. Orden recomendado de ejecución con justificación
+5. Criterios de salida por caso (definition of done)
+6. Qué casos deben requerir aprobación formal antes de ejecutar
+
+[PEGAR MATRIZ DE CASOS AQUÍ]
+
+Restricción: Aplica criterios ISTQB y SRE. Sin recomendaciones genéricas de testing.`,
+    tips: [
+      "Pega el contenido de CASOS_DE_PRUEBA_RENDIMIENTO.md",
+      "Ejecutar antes de cada ciclo de pruebas"
+    ]
+  },
+  {
+    id: 9,
+    title: "Interpretación de ai-insights.json",
+    category: "analisis",
+    mode: "reutilizable",
+    level: 1,
+    icon: "🤖",
+    color: "#3fb950",
+    iconBg: "rgba(63,185,80,0.15)",
+    desc: "Interpreta el JSON generado por Ollama/heurística. Explica cada sección y traduce las métricas a acciones concretas.",
+    tags: ["Ollama", "ai-insights", "automatizado"],
+    tagStyle: "green",
+    prompt: `Actúa como consultor de calidad con experiencia en sistemas gubernamentales.
+
+Te comparto el archivo ai-insights.json generado automáticamente por el framework SI058 usando Ollama.
+
+Tarea:
+1. Explica cada sección del JSON en lenguaje claro
+2. Identifica las 3 alertas más críticas
+3. Traduce las métricas a acciones concretas para el equipo
+4. Determina si el diagnóstico heurístico es consistente con los datos
+
+[PEGAR CONTENIDO ai-insights.json AQUÍ]
+
+Restricción: No reformates el JSON. Analiza su contenido tal cual está.`,
+    tips: [
+      "Archivo en: reports/<RUN>/ai-insights.json",
+      "Úsalo cuando Ollama genera análisis pero quieres segunda opinión"
+    ]
+  },
+
+  // ── REVISIÓN DE CÓDIGO ──────────────────────────────────────────
+  {
+    id: 10,
+    title: "Revisar módulo refactorizado",
+    category: "codigo",
+    mode: "reutilizable",
+    level: 2,
+    icon: "🔍",
+    color: "#3fb950",
+    iconBg: "rgba(63,185,80,0.15)",
+    desc: "Detecta mutaciones, lógica duplicada, riesgos en comandos npm y mejoras de legibilidad en cualquier módulo del framework.",
+    tags: ["refactor", "clean code", "lib/"],
+    tagStyle: "green",
+    hasVars: true,
+    vars: [
+      { name: "{{ARCHIVO}}", desc: "Ej: lib/users.js" },
+      { name: "{{OBJETIVO_DEL_CAMBIO}}", desc: "Ej: evitar mutación de objetos" }
+    ],
+    prompt: `Actúa como arquitecto senior de QA performance especializado en k6 y clean code.
+
+Contexto: Estoy refactorizando un framework k6 en Windows. Tengo entrypoints separados (carnet.js y grados.js) que no deben fusionarse. Acabo de modificar {{ARCHIVO}} para {{OBJETIVO_DEL_CAMBIO}}.
+
+Tarea: Revisa el siguiente código e identifica:
+1. Mutaciones de objetos no corregidas
+2. Lógica duplicada que debería estar en lib/ o config/
+3. Riesgos de romper los comandos npm existentes
+4. Mejoras de legibilidad sin cambiar funcionalidad
+
+[PEGAR CÓDIGO AQUÍ]
+
+Formato: Lista numerada por problema, con línea afectada, explicación y corrección sugerida.
+
+Restricción: No sugieras mover archivos ni renombrarlos. No cambies la lógica de handleSummary ni de reportes.`,
+    tips: [
+      "Reemplaza {{ARCHIVO}} y {{OBJETIVO_DEL_CAMBIO}} antes de enviar",
+      "Pega solo el archivo modificado, no todo el proyecto",
+      "Ideal después de cada sesión de refactoring"
+    ]
+  },
+  {
+    id: 11,
+    title: "Revisar script de herramienta (tools/)",
+    category: "codigo",
+    mode: "reutilizable",
+    level: 2,
+    icon: "🛠️",
+    color: "#3fb950",
+    iconBg: "rgba(63,185,80,0.15)",
+    desc: "Revisión específica para scripts en tools/ (generar-excel, generar-word, generar-plantilla). Detecta errores de parsing y compatibilidad.",
+    tags: ["tools/", "Node.js", "Excel", "Word"],
+    tagStyle: "green",
+    hasVars: true,
+    vars: [
+      { name: "{{HERRAMIENTA}}", desc: "Ej: generar-excel.js" },
+      { name: "{{PROBLEMA}}", desc: "Ej: métricas en cero" }
+    ],
+    prompt: `Actúa como ingeniero Node.js senior especializado en generación de reportes (Excel/Word/HTML).
+
+Contexto: Tengo un script {{HERRAMIENTA}} en el directorio tools/ de mi framework k6 SI058. El problema actual es: {{PROBLEMA}}.
+
+El script lee de reports/<RUN>/k6-output.json y genera artefactos de auditoría para SUNEDU.
+
+Tarea:
+1. Identifica la causa raíz del problema
+2. Revisa el flujo de parsing de métricas k6
+3. Asegúrate de que el script maneja Exit Code 99 correctamente
+4. Propón el fix con código listo para aplicar
+
+[PEGAR CÓDIGO DE {{HERRAMIENTA}} AQUÍ]
+
+Formato: Causa raíz → Código corregido (con comentarios en líneas cambiadas) → Cómo prevenir.
+
+Restricción: No cambies la estructura de salida del archivo generado.`,
+    tips: [
+      "Exit Code 99 = k6 ejecutó pero thresholds fallaron. El script debe continuar.",
+      "Úsalo cuando generar-excel.js o generar-word.js producen ceros"
+    ]
+  },
+  {
+    id: 12,
+    title: "Auditoría completa del framework",
+    category: "codigo",
+    mode: "reutilizable",
+    level: 3,
+    icon: "🏛️",
+    color: "#d29922",
+    iconBg: "rgba(210,153,34,0.15)",
+    desc: "Revisión arquitectural completa: consistencia entre módulos, dead code, dependencias circulares y preparación para auditoría SUNEDU.",
+    tags: ["arquitectura", "auditoría", "SUNEDU"],
+    tagStyle: "orange",
+    prompt: `Actúa como arquitecto de software con experiencia en frameworks de testing y cumplimiento institucional.
+
+Contexto: Tengo un framework k6 para pruebas de rendimiento del sistema SI058 de SUNEDU. Estructura principal:
+- carnet.js / grados.js (entrypoints, nunca fusionar)
+- lib/ (lógica compartida: users.js, http.js, checks.js, summary.js)
+- config/ (thresholds.js, scenarios.js, env.js)
+- tools/ (generadores de reportes: excel, word, html, plantilla)
+- data/ (CSVs de datos de prueba)
+
+Tarea: Con el siguiente package.json y estructura de módulos, identifica:
+1. Inconsistencias entre comandos npm y archivos reales
+2. Módulos que deberían estar en lib/ pero están duplicados
+3. Dead code o imports sin usar
+4. Riesgos para la reproducibilidad del framework en otro equipo
+
+[PEGAR package.json Y LISTA DE ARCHIVOS]
+
+Restricción: No propongas cambios de nombre de archivos. Solo mejoras internas.`,
+    tips: [
+      "Ejecutar una vez por sprint o antes de entrega formal",
+      "Pega: package.json + output de 'tree /F' del proyecto"
+    ]
+  },
+
+  // ── THRESHOLDS & CONFIG ─────────────────────────────────────────
+  {
+    id: 13,
+    title: "Generar threshold para nuevo escenario",
+    category: "thresholds",
+    mode: "reutilizable",
+    level: 1,
+    icon: "📐",
+    color: "#d29922",
+    iconBg: "rgba(210,153,34,0.15)",
+    desc: "Genera el bloque JS de thresholds para cualquier escenario nuevo, manteniendo la estructura existente de config/thresholds.js.",
+    tags: ["thresholds", "config/", "SLO"],
+    tagStyle: "orange",
+    hasVars: true,
+    vars: [
+      { name: "{{NOMBRE_ESCENARIO}}", desc: "Ej: spike" },
+      { name: "{{VUS}}", desc: "Ej: 500" },
+      { name: "{{MS}}", desc: "Ej: 2000" },
+      { name: "{{TASA_ERROR}}", desc: "Ej: 5" },
+      { name: "{{ENDPOINT}}", desc: "Ej: /api/carnet/validar" }
+    ],
+    prompt: `Actúa como experto en SLOs y performance testing con k6.
+
+Contexto: Mi proyecto tiene thresholds centralizados en config/thresholds.js con escenarios: smoke, load, stress y audit.
+
+Tarea: Genera el bloque de thresholds para un nuevo escenario llamado {{NOMBRE_ESCENARIO}} con estas características:
+- Usuarios concurrentes: {{VUS}}
+- Tiempo máximo aceptable p95: {{MS}}ms
+- Tasa de error máxima: {{TASA_ERROR}}%
+- Endpoint crítico: {{ENDPOINT}}
+
+Formato: Bloque JavaScript listo para pegar en config/thresholds.js, con comentario explicando cada threshold.
+
+Restricción: Mantener la misma estructura de objeto que los escenarios existentes. No uses valores arbitrarios — justifica cada threshold.`,
+    tips: [
+      "Reemplaza los 5 placeholders antes de enviar",
+      "Pega el bloque de un escenario existente como referencia adicional"
+    ]
+  },
+  {
+    id: 14,
+    title: "Revisar configuración de escenarios",
+    category: "thresholds",
+    mode: "reutilizable",
+    level: 2,
+    icon: "⚙️",
+    color: "#d29922",
+    iconBg: "rgba(210,153,34,0.15)",
+    desc: "Valida que los escenarios de config/scenarios.js sean coherentes con los thresholds y las capacidades reales del sistema.",
+    tags: ["scenarios.js", "VUs", "rampup"],
+    tagStyle: "orange",
+    prompt: `Actúa como experto en performance testing con k6 y diseño de escenarios de carga.
+
+Contexto: Framework k6 para SI058 SUNEDU. Ejecutamos pruebas contra endpoints de consulta de carnets y grados universitarios. El sistema está detrás de un WAF y soporta ~10 IPs rotativas.
+
+Tarea: Revisa los escenarios definidos y valida:
+1. ¿Los stages de rampa son realistas para el tipo de prueba?
+2. ¿Hay riesgo de saturar el sistema antes de estabilizar?
+3. ¿Los tiempos de gracia (gracefulStop) son suficientes?
+4. ¿Los VUs máximos son coherentes con los thresholds de p95?
+
+[PEGAR config/scenarios.js y config/thresholds.js]
+
+Formato: Análisis por escenario en tabla, luego recomendaciones priorizadas.
+
+Restricción: No cambies los nombres de los escenarios existentes.`,
+    tips: [
+      "Ejecutar antes de pruebas stress o collapse",
+      "Pega ambos archivos: scenarios.js y thresholds.js juntos"
+    ]
+  },
+  {
+    id: 15,
+    title: "Calibrar SLOs para auditoría SUNEDU",
+    category: "thresholds",
+    mode: "reutilizable",
+    level: 3,
+    icon: "🎯",
+    color: "#d29922",
+    iconBg: "rgba(210,153,34,0.15)",
+    desc: "Define SLOs defensibles ante una auditoría institucional, alineados con ISO/IEC 25010 y los resultados históricos del sistema.",
+    tags: ["SLO", "ISO 25010", "auditoría"],
+    tagStyle: "orange",
+    prompt: `Actúa como consultor de SRE con experiencia en sistemas gubernamentales auditados bajo ISO/IEC 25010 y MINEDU/SUNEDU.
+
+Contexto: El sistema SI058 procesa consultas de carnets universitarios y grados. Tiene SLA implícito con las universidades registradas. Los reportes van a una auditoría formal.
+
+Tarea: Con los resultados históricos que te comparto, propón SLOs defensibles que:
+1. Sean alcanzables con los datos actuales de rendimiento
+2. Sean lo suficientemente exigentes para demostrar calidad
+3. Estén alineados con ISO/IEC 25010 (Eficiencia de rendimiento)
+4. Puedan justificarse documentalmente ante auditores
+
+[PEGAR RESULTADOS DE PRUEBAS ANTERIORES]
+
+Formato: Tabla de SLOs con métrica, valor propuesto, justificación y referencia normativa.
+
+Restricción: No propongas SLOs que los datos actuales no puedan cumplir.`,
+    tips: [
+      "Pega resultados de smoke, load y stress para calibración completa",
+      "Usar el output antes de redactar el informe final de auditoría"
+    ]
+  },
+
+  // ── DEBUG & CSV ─────────────────────────────────────────────────
+  {
+    id: 16,
+    title: "Depurar error en validate-csv.js",
+    category: "debug",
+    mode: "reutilizable",
+    level: 1,
+    icon: "🐛",
+    color: "#ff7b72",
+    iconBg: "rgba(255,123,114,0.15)",
+    desc: "Diagnóstico rápido de errores en el script de validación de CSVs. Causa raíz, fix exacto y prevención futura.",
+    tags: ["CSV", "validate", "Node.js"],
+    tagStyle: "pink",
+    hasVars: true,
+    vars: [
+      { name: "{{ERROR}}", desc: "Stack trace del error" },
+      { name: "{{HEADERS}}", desc: "Ej: dni,nombre,codigo" }
+    ],
+    prompt: `Actúa como experto en Node.js y validación de datos.
+
+Contexto: Tengo un script validate-csv.js que valida archivos de usuarios antes de ejecutar pruebas k6. El script está fallando con el siguiente error:
+
+{{ERROR}}
+
+El CSV afectado tiene esta estructura esperada:
+{{HEADERS}}
+
+Tarea: Identifica la causa del error, explica por qué ocurre y dame el fix exacto con el código corregido.
+
+Formato:
+1. Causa raíz (2 líneas máximo)
+2. Código corregido con comentario en la línea cambiada
+3. Cómo prevenir este error en el futuro
+
+Restricción: No cambies la lógica de validación existente, solo corrige el bug puntual.`,
+    tips: [
+      "Copia el stack trace completo en {{ERROR}}",
+      "Incluye las primeras 3 líneas del CSV como muestra adicional"
+    ]
+  },
+  {
+    id: 17,
+    title: "Analizar CSV corrupto o incompleto",
+    category: "debug",
+    mode: "reutilizable",
+    level: 1,
+    icon: "📂",
+    color: "#ff7b72",
+    iconBg: "rgba(255,123,114,0.15)",
+    desc: "Identifica filas problemáticas, encodings incorrectos, delimitadores y datos faltantes en archivos de datos de prueba.",
+    tags: ["CSV", "encoding", "datos"],
+    tagStyle: "pink",
+    prompt: `Actúa como especialista en calidad de datos y Node.js.
+
+Contexto: Tengo archivos CSV en data/ que se usan como datos de prueba para k6 (documentos_carnet.csv y documentos_grados.csv). Uno de ellos tiene problemas que causan fallos en las pruebas.
+
+Tarea: Analiza el CSV que te comparto e identifica:
+1. Filas con formato inválido (campos vacíos, tipos incorrectos)
+2. Problemas de encoding (tildes, ñ, caracteres especiales)
+3. Delimitador inconsistente o comillas mal cerradas
+4. Duplicados exactos y duplicados de clave primaria
+5. Estadísticas básicas: total filas, filas válidas, filas problemáticas
+
+[PEGAR MUESTRA DEL CSV (mínimo 20 filas)]
+
+Formato: Tabla de problemas con número de fila, tipo de error y valor problemático. Luego lista de filas a corregir.
+
+Restricción: No elimines ninguna fila. Solo identifica los problemas.`,
+    tips: [
+      "Pega al menos las primeras 20-30 filas del CSV",
+      "Menciona si el CSV viene de exportación de base de datos o manual"
+    ]
+  },
+
+  // ── STRESS & COLLAPSE ───────────────────────────────────────────
+  {
+    id: 18,
+    title: "Validar plan de prueba collapse",
+    category: "collapse",
+    mode: "reutilizable",
+    level: 3,
+    icon: "💥",
+    color: "#ff7b72",
+    iconBg: "rgba(255,123,114,0.15)",
+    desc: "Revisa precondiciones, ventana de ejecución, límites, criterios de aborto y recuperación antes de ejecutar una prueba destructiva.",
+    tags: ["collapse", "stress", "destructivo"],
+    tagStyle: "pink",
+    prompt: `Actúa como especialista en pruebas destructivas controladas.
+
+Revisa este plan de collapse para SI058.
+
+Valida:
+1. Precondiciones (¿está el ambiente aislado?)
+2. Ventana de ejecución (¿hora y duración son seguros?)
+3. Límites de VUs y duración (¿son razonables para encontrar el punto de quiebre?)
+4. Monitoreo activo durante la prueba (¿qué se observa?)
+5. Criterios de aborto (¿cuándo se detiene la prueba de emergencia?)
+6. Plan de recuperación (¿cómo se restaura el servicio?)
+7. Evidencia esperada (¿qué artefactos genera?)
+
+[PEGAR PLAN DE COLLAPSE AQUÍ]
+
+Dame:
+- APROBADO / OBSERVACIONES / RECHAZADO
+- Lista de correcciones si hay observaciones
+- Comandos exactos de ejecución y aborto
+
+Restricción: No apruebas si no hay criterio de aborto explícito.`,
+    tips: [
+      "Ejecutar SOLO en ambiente de staging, nunca en producción",
+      "Tener el comando de kill listo antes de iniciar"
+    ]
+  },
+  {
+    id: 19,
+    title: "Diseñar escenario de spike test",
+    category: "collapse",
+    mode: "reutilizable",
+    level: 2,
+    icon: "📈",
+    color: "#ff7b72",
+    iconBg: "rgba(255,123,114,0.15)",
+    desc: "Genera el escenario k6 completo para prueba de spike: stages, thresholds, métricas de observación y criterios de éxito.",
+    tags: ["spike", "stages", "k6"],
+    tagStyle: "pink",
+    hasVars: true,
+    vars: [
+      { name: "{{VUS_PICO}}", desc: "Ej: 1000" },
+      { name: "{{DURACION_PICO}}", desc: "Ej: 2m" },
+      { name: "{{ENDPOINT}}", desc: "Ej: /api/carnet/validar" }
+    ],
+    prompt: `Actúa como ingeniero de performance testing especializado en pruebas de estrés con k6.
+
+Contexto: Framework SI058 con entrypoints separados para carnet y grados. Los escenarios están en config/scenarios.js.
+
+Tarea: Diseña un escenario de spike test con estas características:
+- VUs en pico: {{VUS_PICO}}
+- Duración del pico: {{DURACION_PICO}}
+- Endpoint objetivo: {{ENDPOINT}}
+- Rampa de subida y bajada realista para no matar el sistema bruscamente
+
+Entrega:
+1. Bloque de stages para scenarios.js
+2. Bloque de thresholds ajustados para spike (p95 y error rate más permisivos)
+3. Las 5 métricas clave a monitorear durante el spike
+4. Criterio de éxito y criterio de aborto
+
+Formato: Código JavaScript listo para pegar, con comentarios explicativos.
+
+Restricción: El escenario debe poder abortarse en máximo 30 segundos si algo va mal.`,
+    tips: [
+      "Reemplaza los 3 placeholders antes de enviar",
+      "Un spike real debería durar entre 1-5 minutos en el pico"
+    ]
+  },
+  {
+    id: 20,
+    title: "Post-mortem de prueba fallida",
+    category: "collapse",
+    mode: "reutilizable",
+    level: 2,
+    icon: "📝",
+    color: "#d29922",
+    iconBg: "rgba(210,153,34,0.15)",
+    desc: "Estructura el análisis post-mortem de una prueba que terminó en colapso o Exit Code 99 inesperado.",
+    tags: ["post-mortem", "exit-99", "análisis"],
+    tagStyle: "orange",
+    prompt: `Actúa como SRE con experiencia en análisis de incidentes de rendimiento.
+
+Contexto: Una prueba k6 de SI058 terminó de forma inesperada (Exit Code 99 o colapso del sistema). Necesito documentar el incidente para el informe de auditoría SUNEDU.
+
+Tarea: Con los datos que te comparto, genera el post-mortem estructurado:
+1. Resumen ejecutivo (qué pasó, cuándo, impacto)
+2. Línea de tiempo del incidente
+3. Métricas en el momento del colapso
+4. Causa raíz probable
+5. Factores contribuyentes
+6. Acciones inmediatas tomadas
+7. Lecciones aprendidas y mejoras preventivas
+
+[PEGAR LOG DE K6 Y MÉTRICAS DEL INCIDENTE]
+
+Formato: Documento estructurado con secciones numeradas. Incluye tabla de métricas en el punto de colapso.
+
+Restricción: Sin especulación. Cada conclusión debe basarse en datos del log.`,
+    tips: [
+      "Pega el output completo del terminal de k6",
+      "Incluye el timestamp exacto de inicio y fin de la prueba",
+      "Guarda el post-mortem en reports/<RUN>/postmortem.md"
+    ]
+  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────
+let activeFilter = { cat: 'all', level: null, mode: null };
+let searchQuery = '';
+let sortMode = 'category';
+let currentPrompt = null;
+
+// ─── FILTER & RENDER ─────────────────────────────────────────────────
+function getFiltered() {
+  let list = [...PROMPTS];
+  if (activeFilter.cat !== 'all') list = list.filter(p => p.category === activeFilter.cat);
+  if (activeFilter.level) list = list.filter(p => p.level === activeFilter.level);
+  if (activeFilter.mode) list = list.filter(p => p.mode === activeFilter.mode);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.desc.toLowerCase().includes(q) ||
+      p.tags.some(t => t.toLowerCase().includes(q)) ||
+      p.prompt.toLowerCase().includes(q)
+    );
+  }
+  if (sortMode === 'level') list.sort((a,b) => a.level - b.level);
+  else if (sortMode === 'title') list.sort((a,b) => a.title.localeCompare(b.title));
+  else list.sort((a,b) => a.category.localeCompare(b.category) || a.id - b.id);
+  return list;
+}
+
+const CAT_LABELS = {
+  framework: 'Framework & Teoría',
+  analisis: 'Análisis IA',
+  codigo: 'Revisión de Código',
+  thresholds: 'Thresholds & Config',
+  debug: 'Debug & CSV',
+  collapse: 'Stress & Collapse',
+  all: 'Todos'
+};
+
+function levelDots(n) {
+  return [1,2,3].map(i =>
+    `<span class="${i <= n ? 'filled' : ''}"></span>`
+  ).join('');
+}
+
+function renderCards() {
+  const list = getFiltered();
+  const grid = document.getElementById('cardsGrid');
+  document.getElementById('resultCount').textContent = `— ${list.length} resultado${list.length !== 1 ? 's' : ''}`;
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro filtro o búsqueda</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => `
+    <div class="card" data-id="${p.id}" tabindex="0" role="button" aria-label="Ver prompt: ${p.title}">
+      <div class="card-head">
+        <div class="card-icon" style="background:${p.iconBg}">${p.icon}</div>
+        <div class="card-meta">
+          <div class="card-title">${p.title}</div>
+          <div class="card-category">${CAT_LABELS[p.category]}</div>
+        </div>
+      </div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="card-tags">
+        ${p.tags.map(t => `<span class="tag ${p.tagStyle||''}">${t}</span>`).join('')}
+        ${p.mode === 'reutilizable' ? '<span class="tag green">🔁 reutilizable</span>' : '<span class="tag purple">📚 formación</span>'}
+      </div>
+      <div class="card-footer">
+        <div class="card-level">
+          <span>Nivel</span>
+          <div class="level-dots">${levelDots(p.level)}</div>
+        </div>
+        <div class="open-btn">Ver prompt →</div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => openModal(+card.dataset.id));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter') openModal(+card.dataset.id); });
+  });
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────
+function openModal(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  if (!p) return;
+  currentPrompt = p;
+
+  document.getElementById('modalIcon').style.background = p.iconBg;
+  document.getElementById('modalIcon').textContent = p.icon;
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalSubtitle').textContent = `${CAT_LABELS[p.category]} · ${p.mode === 'reutilizable' ? '🔁 Reutilizable' : '📚 Formación'} · Nivel ${p.level}/3`;
+
+  const body = document.getElementById('modalBody');
+  body.innerHTML = `
+    <div>
+      <div class="modal-section-title">Descripción</div>
+      <p class="modal-desc">${p.desc}</p>
+    </div>
+    <div class="modal-tags">
+      ${p.tags.map(t => `<span class="tag ${p.tagStyle||''}">${t}</span>`).join('')}
+    </div>
+    <div>
+      <div class="modal-section-title">Prompt</div>
+      <div class="prompt-block">
+        <div class="prompt-block-header">
+          <span>prompt.txt</span>
+          <button class="copy-btn" id="copyMainBtn" onclick="copyPrompt()">
+            📋 Copiar prompt
+          </button>
+        </div>
+        <div class="prompt-text" id="promptDisplay">${escapeHtml(p.prompt)}</div>
+      </div>
+    </div>
+    ${p.hasVars ? `
+    <div>
+      <div class="modal-section-title">Variables a reemplazar</div>
+      <div class="vars-list">
+        ${p.vars.map(v => `
+          <div class="var-row">
+            <span class="var-name">${v.name}</span>
+            <span class="var-desc">${v.desc}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+    ${p.tips ? `
+    <div>
+      <div class="modal-section-title">Consejos de uso</div>
+      <ul class="tips-list">
+        ${p.tips.map(t => `<li>${t}</li>`).join('')}
+      </ul>
+    </div>` : ''}
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  currentPrompt = null;
+}
+
+function copyPrompt() {
+  if (!currentPrompt) return;
+  navigator.clipboard.writeText(currentPrompt.prompt).then(() => {
+    const btn = document.getElementById('copyMainBtn');
+    if (!btn) return;
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋 Copiar prompt';
+    }, 2000);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── SIDEBAR FILTERS ─────────────────────────────────────────────────
+function updateCounts() {
+  const cats = ['framework','analisis','codigo','thresholds','debug','collapse'];
+  cats.forEach(c => {
+    const el = document.getElementById('cnt-' + c);
+    if (el) el.textContent = PROMPTS.filter(p => p.category === c).length;
+  });
+  document.getElementById('cnt-all').textContent = PROMPTS.length;
+  document.getElementById('totalBadge').textContent = PROMPTS.length + ' prompts';
+}
+
+document.querySelectorAll('.sidebar-btn[data-cat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = { cat: btn.dataset.cat, level: null, mode: null };
+    renderCards();
+    const title = btn.dataset.cat === 'all' ? 'Todos los prompts' : CAT_LABELS[btn.dataset.cat];
+    document.getElementById('sectionTitle').childNodes[0].textContent = title + ' ';
+  });
+});
+
+document.querySelectorAll('.sidebar-btn[data-level]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = { cat: 'all', level: +btn.dataset.level, mode: null };
+    renderCards();
+    document.getElementById('sectionTitle').childNodes[0].textContent = `Nivel ${btn.dataset.level} `;
+  });
+});
+
+document.querySelectorAll('.sidebar-btn[data-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = { cat: 'all', level: null, mode: btn.dataset.mode };
+    renderCards();
+    document.getElementById('sectionTitle').childNodes[0].textContent = btn.dataset.mode === 'reutilizable' ? 'Prompts reutilizables ' : 'Prompts de formación ';
+  });
+});
+
+// ─── SEARCH ──────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderCards();
+});
+
+// ─── SORT ────────────────────────────────────────────────────────────
+const sortModes = [
+  { key: 'category', label: 'Ordenar: Categoría ↕' },
+  { key: 'level', label: 'Ordenar: Nivel ↕' },
+  { key: 'title', label: 'Ordenar: Título A-Z' }
+];
+let sortIdx = 0;
+document.getElementById('sortBtn').addEventListener('click', () => {
+  sortIdx = (sortIdx + 1) % sortModes.length;
+  sortMode = sortModes[sortIdx].key;
+  document.getElementById('sortBtn').textContent = sortModes[sortIdx].label;
+  renderCards();
+});
+
+// ─── MODAL CLOSE ─────────────────────────────────────────────────────
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+updateCounts();
+renderCards();
+</script>
+</body>
+</html>
