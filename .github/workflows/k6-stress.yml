@@ -8,10 +8,10 @@ name: SI058 k6 Smoke/Audit (self-hosted)
 # self-hosted runner con label 'sunedu-pc-k6'.
 #
 # Secrets requeridos en el repo:
-#   SUNEDU_BASE_URL
-#   SUNEDU_USUARIO_1 / SUNEDU_CLAVE_1 / SUNEDU_DOC_1 / SUNEDU_ENTIDAD_1
-#   SUNEDU_USUARIO_2 / SUNEDU_CLAVE_2 / SUNEDU_DOC_2 / SUNEDU_ENTIDAD_2
-#   K6_LOCAL_IPS                  (opcional: solo IP DHCP ej. 192.168.28.8, o rango 48-57 si hay alias)
+#   SUNEDU_WSGT_BASE_URL
+#   SUNEDU_WSGT_USUARIO_1 / SUNEDU_WSGT_CLAVE_1 / SUNEDU_WSGT_DOC_1 / SUNEDU_WSGT_ENTIDAD_1
+#   SUNEDU_WSGT_USUARIO_2 / SUNEDU_WSGT_CLAVE_2 / SUNEDU_WSGT_DOC_2 / SUNEDU_WSGT_ENTIDAD_2
+#   K6_LOCAL_IPS_WSGT             (opcional: solo IP DHCP ej. 192.168.28.8, o rango 48-57 si hay alias)
 #   K6_PROMETHEUS_RW_USERNAME
 #   K6_PROMETHEUS_RW_PASSWORD
 #   K6_PROMETHEUS_RW_SERVER_URL
@@ -63,16 +63,16 @@ jobs:
       - name: Ejecutar prueba smoke/audit ${{ inputs.test_type }}
         shell: powershell
         env:
-          BASE_URL:                  ${{ secrets.SUNEDU_BASE_URL }}
-          K6_LOCAL_IPS:              ${{ secrets.K6_LOCAL_IPS }}
-          SUNEDU_USUARIO_1:          ${{ secrets.SUNEDU_USUARIO_1 }}
-          SUNEDU_CLAVE_1:            ${{ secrets.SUNEDU_CLAVE_1 }}
-          SUNEDU_DOC_1:              ${{ secrets.SUNEDU_DOC_1 }}
-          SUNEDU_ENTIDAD_1:          ${{ secrets.SUNEDU_ENTIDAD_1 }}
-          SUNEDU_USUARIO_2:          ${{ secrets.SUNEDU_USUARIO_2 }}
-          SUNEDU_CLAVE_2:            ${{ secrets.SUNEDU_CLAVE_2 }}
-          SUNEDU_DOC_2:              ${{ secrets.SUNEDU_DOC_2 }}
-          SUNEDU_ENTIDAD_2:          ${{ secrets.SUNEDU_ENTIDAD_2 }}
+          BASE_URL:                  ${{ secrets.SUNEDU_WSGT_BASE_URL }}
+          K6_LOCAL_IPS:              ${{ secrets.K6_LOCAL_IPS_WSGT }}
+          SUNEDU_USUARIO_1:          ${{ secrets.SUNEDU_WSGT_USUARIO_1 }}
+          SUNEDU_CLAVE_1:            ${{ secrets.SUNEDU_WSGT_CLAVE_1 }}
+          SUNEDU_DOC_1:              ${{ secrets.SUNEDU_WSGT_DOC_1 }}
+          SUNEDU_ENTIDAD_1:          ${{ secrets.SUNEDU_WSGT_ENTIDAD_1 }}
+          SUNEDU_USUARIO_2:          ${{ secrets.SUNEDU_WSGT_USUARIO_2 }}
+          SUNEDU_CLAVE_2:            ${{ secrets.SUNEDU_WSGT_CLAVE_2 }}
+          SUNEDU_DOC_2:              ${{ secrets.SUNEDU_WSGT_DOC_2 }}
+          SUNEDU_ENTIDAD_2:          ${{ secrets.SUNEDU_WSGT_ENTIDAD_2 }}
           TEST_ID:                   ci-${{ github.run_number }}
           ENVIRONMENT:               qa
           TESTER:                    github-actions
