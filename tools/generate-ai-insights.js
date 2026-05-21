@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const http = require('http');
+const fs = require('node:fs');
+const path = require('node:path');
+const http = require('node:http');
 const { systemPrompt, buildUserPrompt, buildFallback } = require('./ai-prompts');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -59,7 +57,7 @@ console.log(`[IA] Consultando Ollama (${MODEL}) en http://${OLLAMA_HOST}:${OLLAM
 let finished = false;
 const req = http.request(reqOptions, (res) => {
   let data = '';
-  res.on('data', chunk => data += chunk);
+  res.on('data', (chunk) => (data += chunk));
   res.on('end', () => {
     if (finished) return;
     finished = true;

@@ -1,5 +1,3 @@
-'use strict';
-
 const command = process.argv[2] || 'comando';
 
 const pending = {
@@ -31,6 +29,8 @@ const message = pending[command] || 'Pendiente de implementacion en esta fase.';
 console.error('');
 console.error(`[PENDIENTE] ${command}`);
 console.error(message);
-console.error('Fase actual aprobada para ejecutar: smoke, perf:carnet:smoke, perf:grados:smoke, perf:carnet:audit, perf:grados:audit.');
+console.error(
+  'Fase actual aprobada para ejecutar: smoke, perf:carnet:smoke, perf:grados:smoke, perf:carnet:audit, perf:grados:audit.',
+);
 console.error('');
 process.exit(1);

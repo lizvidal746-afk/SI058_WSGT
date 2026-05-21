@@ -1,4 +1,3 @@
-'use strict';
 /**
  * tools/lib/k6-reader.js
  * ══════════════════════════════════════════════════════════════════════════════
@@ -35,17 +34,17 @@
  * ══════════════════════════════════════════════════════════════════════════════
  */
 
-const fs   = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // ── SLOs institucionales SUNEDU (sobrescribibles) ────────────────────────────
 const DEFAULT_SLO = {
-  p95Ms:      1500,   // Latencia máx. aceptable (p95)
-  p99Ms:      2000,   // Latencia máx. cola (p99)
-  errorRate:  0.01,   // 1% tasa de errores
-  checksRate: 0.99,   // 99% validaciones funcionales
-  apdexMin:   0.90,   // Índice mínimo de satisfacción
-  apdexTarget: 800,   // ms para considerar "satisfecho" en APDEX
+  p95Ms: 1500, // Latencia máx. aceptable (p95)
+  p99Ms: 2000, // Latencia máx. cola (p99)
+  errorRate: 0.01, // 1% tasa de errores
+  checksRate: 0.99, // 99% validaciones funcionales
+  apdexMin: 0.9, // Índice mínimo de satisfacción
+  apdexTarget: 800, // ms para considerar "satisfecho" en APDEX
 };
 
 // ── Clase principal ──────────────────────────────────────────────────────────
@@ -57,7 +56,7 @@ class K6Reader {
    */
   constructor(jsonPath, sloOverrides = {}) {
     this.jsonPath = path.resolve(jsonPath);
-    this.slo      = { ...DEFAULT_SLO, ...sloOverrides };
+    this.slo = { ...DEFAULT_SLO, ...sloOverrides };
 
     // ── Carga y validación inicial ──────────────────────────────────────────
     if (!fs.existsSync(this.jsonPath)) {
@@ -71,37 +70,41 @@ class K6Reader {
       throw new Error(`[K6Reader] JSON inválido en "${path.basename(this.jsonPath)}": ${e.message}`);
     }
 
-    this._m    = raw.metrics    || {};
+    this._m = raw.metrics || {};
     this._root = raw.root_group || null;
-    this._raw  = raw;
+    this._raw = raw;
 
     // ── Validación de contrato de datos ────────────────────────────────────
     this._validateContract();
 
     // ── Metadatos del run ──────────────────────────────────────────────────
-    const base     = path.basename(this.jsonPath, '.json');
-    this.testName  = base.replace(/-\d{4}-\d{2}-\d{2}.*$/, '').toUpperCase();
-    this.runId     = base;
-    this.outDir    = path.dirname(this.jsonPath);
-    this.sourceIp  = raw.metadata?.ip_origen ?? this._inferSourceIp();
+    const base = path.basename(this.jsonPath, '.json');
+    this.testName = base.replace(/-\d{4}-\d{2}-\d{2}.*$/, '').toUpperCase();
+    this.runId = base;
+    this.outDir = path.dirname(this.jsonPath);
+    this.sourceIp = raw.metadata?.ip_origen ?? this._inferSourceIp();
     this.generatedAt = new Date().toLocaleString('es-PE', {
       timeZone: 'America/Lima',
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       hour12: false,
     });
 
     console.log(
       `[K6Reader] ✅ JSON validado | Run: ${this.runId}\n` +
-      `           Requests: ${this.totalRequests} | p95: ${Math.round(this.p95)}ms | ` +
-      `APDEX: ${this.apdex.toFixed(3)} | Estado: ${this.statusEmoji} ${this.status}`
+        `           Requests: ${this.totalRequests} | p95: ${Math.round(this.p95)}ms | ` +
+        `APDEX: ${this.apdex.toFixed(3)} | Estado: ${this.statusEmoji} ${this.status}`,
     );
   }
 
   // ── Validación de contrato ────────────────────────────────────────────────
   _validateContract() {
     const required = ['http_req_duration', 'http_reqs', 'http_req_failed'];
-    const missing  = required.filter(k => !this._m[k]);
+    const missing = required.filter((k) => !this._m[k]);
     if (missing.length) {
       throw new Error(`[K6Reader] Métricas requeridas faltantes: ${missing.join(', ')}`);
     }
@@ -109,8 +112,8 @@ class K6Reader {
     if (this.totalRequests === 0) {
       throw new Error(
         `[K6Reader] ABORT: El run tiene 0 requests HTTP.\n` +
-        `  Causas posibles: run vacío, script k6 sin requests, o JSON incorrecto.\n` +
-        `  Archivo: ${this.jsonPath}`
+          `  Causas posibles: run vacío, script k6 sin requests, o JSON incorrecto.\n` +
+          `  Archivo: ${this.jsonPath}`,
       );
     }
   }
@@ -130,13 +133,20 @@ class K6Reader {
   trend(name, stat) {
     const metric = this._m[name];
     if (!metric) return 0;
-    
+
     // Soportar formato k6 interno (con .values) y formato summary-export (aplanado)
     const v = metric.values || metric;
-    
+
     const statMap = {
-      p50: 'med', p90: 'p(90)', p95: 'p(95)', p99: 'p(99)',
-      avg: 'avg',  min: 'min',  max: 'max',  count: 'count', med: 'med',
+      p50: 'med',
+      p90: 'p(90)',
+      p95: 'p(95)',
+      p99: 'p(99)',
+      avg: 'avg',
+      min: 'min',
+      max: 'max',
+      count: 'count',
+      med: 'med',
     };
     return v[statMap[stat] ?? stat] ?? 0;
   }
@@ -196,7 +206,7 @@ class K6Reader {
 
   metricValues(name) {
     const m = this._m[name];
-    return m ? (m.values || m) : {};
+    return m ? m.values || m : {};
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -204,8 +214,12 @@ class K6Reader {
   // ══════════════════════════════════════════════════════════════════════════
 
   // Latencia principal
-  get totalRequests() { return this.counter('http_reqs', 'count'); }
-  get testRunDurationMs() { return this._raw.state?.testRunDurationMs ?? 0; }
+  get totalRequests() {
+    return this.counter('http_reqs', 'count');
+  }
+  get testRunDurationMs() {
+    return this._raw.state?.testRunDurationMs ?? 0;
+  }
   get testRunDurationStr() {
     const ms = this.testRunDurationMs;
     if (ms === 0) return 'N/D';
@@ -215,41 +229,95 @@ class K6Reader {
     if (mins === 0) return `${secs}s`;
     return `${mins}m ${secs}s`;
   }
-  get rps()           { return this.counter('http_reqs', 'rps'); }
-  get p50()           { return this.trend('http_req_duration', 'p50'); }
-  get p90()           { return this.trend('http_req_duration', 'p90'); }
-  get p95()           { return this.trend('http_req_duration', 'p95'); }
-  get p99()           { return this.trend('http_req_duration', 'p99'); }
-  get avgDuration()   { return this.trend('http_req_duration', 'avg'); }
-  get maxDuration()   { return this.trend('http_req_duration', 'max'); }
-  get minDuration()   { return this.trend('http_req_duration', 'min'); }
+  get rps() {
+    return this.counter('http_reqs', 'rps');
+  }
+  get p50() {
+    return this.trend('http_req_duration', 'p50');
+  }
+  get p90() {
+    return this.trend('http_req_duration', 'p90');
+  }
+  get p95() {
+    return this.trend('http_req_duration', 'p95');
+  }
+  get p99() {
+    return this.trend('http_req_duration', 'p99');
+  }
+  get avgDuration() {
+    return this.trend('http_req_duration', 'avg');
+  }
+  get maxDuration() {
+    return this.trend('http_req_duration', 'max');
+  }
+  get minDuration() {
+    return this.trend('http_req_duration', 'min');
+  }
 
   // Calidad
-  get errorRate()   { return this.rate('http_req_failed'); }
-  get checksRate()  { return this.rate('checks'); }
-  get sessionRate() { return this.rate('session_success_rate'); }
-  get apdex()       { return this.trend('apdex_score', 'avg'); }
+  get errorRate() {
+    return this.rate('http_req_failed');
+  }
+  get checksRate() {
+    return this.rate('checks');
+  }
+  get sessionRate() {
+    return this.rate('session_success_rate');
+  }
+  get apdex() {
+    return this.trend('apdex_score', 'avg');
+  }
 
   // Descomposición de latencia (Golden Signals SRE)
-  get ttfb()         { return this.trend('http_req_waiting',        'avg'); }
-  get ttfbP95()      { return this.trend('http_req_waiting',        'p95'); }
-  get blockedAvg()   { return this.trend('http_req_blocked',        'avg'); }
-  get blockedP95()   { return this.trend('http_req_blocked',        'p95'); }
-  get tlsAvg()       { return this.trend('http_req_tls_handshaking','avg'); }
-  get tlsP95()       { return this.trend('http_req_tls_handshaking','p95'); }
-  get connectingAvg(){ return this.trend('http_req_connecting',     'avg'); }
-  get sendingAvg()   { return this.trend('http_req_sending',        'avg'); }
-  get receivingAvg() { return this.trend('http_req_receiving',      'avg'); }
-  get iterationAvg() { return this.trend('iteration_duration',      'avg'); }
+  get ttfb() {
+    return this.trend('http_req_waiting', 'avg');
+  }
+  get ttfbP95() {
+    return this.trend('http_req_waiting', 'p95');
+  }
+  get blockedAvg() {
+    return this.trend('http_req_blocked', 'avg');
+  }
+  get blockedP95() {
+    return this.trend('http_req_blocked', 'p95');
+  }
+  get tlsAvg() {
+    return this.trend('http_req_tls_handshaking', 'avg');
+  }
+  get tlsP95() {
+    return this.trend('http_req_tls_handshaking', 'p95');
+  }
+  get connectingAvg() {
+    return this.trend('http_req_connecting', 'avg');
+  }
+  get sendingAvg() {
+    return this.trend('http_req_sending', 'avg');
+  }
+  get receivingAvg() {
+    return this.trend('http_req_receiving', 'avg');
+  }
+  get iterationAvg() {
+    return this.trend('iteration_duration', 'avg');
+  }
 
   // Infraestructura
-  get vusMax()     { return this.gauge('vus_max', 'max'); }
-  get dataRecvKB() { return Math.round((this.counter('data_received', 'count') / 1024) * 100) / 100; }
-  get dataSentKB() { return Math.round((this.counter('data_sent',     'count') / 1024) * 100) / 100; }
+  get vusMax() {
+    return this.gauge('vus_max', 'max');
+  }
+  get dataRecvKB() {
+    return Math.round((this.counter('data_received', 'count') / 1024) * 100) / 100;
+  }
+  get dataSentKB() {
+    return Math.round((this.counter('data_sent', 'count') / 1024) * 100) / 100;
+  }
 
   // Checks raw
-  get checksPasses() { return this.rateCounts('checks').passes; }
-  get checksFails()  { return this.rateCounts('checks').fails; }
+  get checksPasses() {
+    return this.rateCounts('checks').passes;
+  }
+  get checksFails() {
+    return this.rateCounts('checks').fails;
+  }
 
   _inferSourceIp() {
     const ips = this.localIps;
@@ -276,7 +344,7 @@ class K6Reader {
   /** @returns {string[]} Lista de IPs detectadas en las métricas */
   get localIps() {
     const ips = new Set();
-    Object.keys(this._m).forEach(k => {
+    Object.keys(this._m).forEach((k) => {
       const match = k.match(/source_ip:([^}]+)/);
       if (match) ips.add(match[1]);
     });
@@ -285,26 +353,26 @@ class K6Reader {
 
   /**
    * Retorna un set de métricas filtrado por IP.
-   * @param {string} ip 
+   * @param {string} ip
    */
   getMetricsByIp(ip) {
     const getV = (name) => {
       const m = this._m[name];
-      return m ? (m.values || m) : {};
+      return m ? m.values || m : {};
     };
 
     return {
-      dur:  getV(`http_req_duration{source_ip:${ip}}`),
+      dur: getV(`http_req_duration{source_ip:${ip}}`),
       fail: getV(`http_req_failed{source_ip:${ip}}`),
       ttfb: getV(`ttfb_ms{source_ip:${ip}}`),
-      blk:  getV(`http_req_blocked{source_ip:${ip}}`),
-      tls:  getV(`http_req_tls_handshaking{source_ip:${ip}}`),
+      blk: getV(`http_req_blocked{source_ip:${ip}}`),
+      tls: getV(`http_req_tls_handshaking{source_ip:${ip}}`),
     };
   }
 
   get statusCodeSummary() {
     const rows = [];
-    Object.keys(this._m).forEach(k => {
+    Object.keys(this._m).forEach((k) => {
       const match = k.match(/^http_reqs\{status:(\d+)\}$/);
       if (!match) return;
       const v = this.metricValues(k);
@@ -318,7 +386,7 @@ class K6Reader {
   }
 
   get ipSummary() {
-    return this.localIps.map(ip => {
+    return this.localIps.map((ip) => {
       const m = this.getMetricsByIp(ip);
       return {
         ip,
@@ -326,7 +394,7 @@ class K6Reader {
         p95: Math.round(m.dur['p(95)'] ?? 0),
         p99: Math.round(m.dur['p(99)'] ?? 0),
         avg: Math.round(m.dur.avg ?? 0),
-        error_rate: parseFloat(((m.fail.rate ?? m.fail.value ?? 0)).toFixed(4)),
+        error_rate: parseFloat((m.fail.rate ?? m.fail.value ?? 0).toFixed(4)),
         ttfb_avg: Math.round(m.ttfb.avg ?? 0),
         blocked_avg: Math.round(m.blk.avg ?? 0),
         tls_avg: Math.round(m.tls.avg ?? 0),
@@ -342,11 +410,11 @@ class K6Reader {
   get errorBudget() {
     const consumed = Math.min((this.p95 / this.slo.p95Ms) * 100, 100);
     return {
-      consumedPct:  parseFloat(consumed.toFixed(1)),
+      consumedPct: parseFloat(consumed.toFixed(1)),
       remainingPct: parseFloat((100 - consumed).toFixed(1)),
-      marginMs:     Math.max(0, Math.round(this.slo.p95Ms - this.p95)),
-      sloMs:        this.slo.p95Ms,
-      p95Ms:        Math.round(this.p95),
+      marginMs: Math.max(0, Math.round(this.slo.p95Ms - this.p95)),
+      sloMs: this.slo.p95Ms,
+      p95Ms: Math.round(this.p95),
     };
   }
 
@@ -359,7 +427,7 @@ class K6Reader {
   /** @returns {'PASA'|'DEGRADADO'|'FALLA'} */
   get status() {
     if (this.sloPass && this.apdex >= this.slo.apdexMin) return 'PASA';
-    if (this.p95 < this.slo.p95Ms * 1.2)                 return 'DEGRADADO';
+    if (this.p95 < this.slo.p95Ms * 1.2) return 'DEGRADADO';
     return 'FALLA';
   }
 
@@ -400,13 +468,13 @@ class K6Reader {
       // Grupos que contienen un endpoint real (tienen URL en el nombre)
       if (name.includes('Carnet') || name.includes('Grados')) {
         const checksObj = group.checks ?? {};
-        const checks    = Object.values(checksObj);
+        const checks = Object.values(checksObj);
         result.push({
           name,
           endpoint: name.includes('Carnet') ? 'carnet_consulta' : 'grados_consulta',
-          url:      name.match(/https?:\/\/[^\s()]+/)?.[0] ?? 'N/D',
-          passes:   checks.reduce((a, c) => a + (c.passes ?? 0), 0),
-          fails:    checks.reduce((a, c) => a + (c.fails  ?? 0), 0),
+          url: name.match(/https?:\/\/[^\s()]+/)?.[0] ?? 'N/D',
+          passes: checks.reduce((a, c) => a + (c.passes ?? 0), 0),
+          fails: checks.reduce((a, c) => a + (c.fails ?? 0), 0),
           checks,
         });
       }
@@ -432,30 +500,28 @@ class K6Reader {
     for (const iter of this.endpointIterations) {
       if (!map[iter.endpoint]) {
         map[iter.endpoint] = {
-          endpoint:      iter.endpoint,
-          url:           iter.url,
+          endpoint: iter.endpoint,
+          url: iter.url,
           totalRequests: 0,
-          passes:        0,
-          fails:         0,
-          iterations:    0,
+          passes: 0,
+          fails: 0,
+          iterations: 0,
         };
       }
       const ep = map[iter.endpoint];
-      ep.totalRequests += (iter.passes + iter.fails);
-      ep.passes        += iter.passes;
-      ep.fails         += iter.fails;
-      ep.iterations    += 1;
+      ep.totalRequests += iter.passes + iter.fails;
+      ep.passes += iter.passes;
+      ep.fails += iter.fails;
+      ep.iterations += 1;
     }
 
-    return Object.values(map).map(ep => {
+    return Object.values(map).map((ep) => {
       const dur = this.metricValues(`http_req_duration{endpoint:${ep.endpoint}}`);
       const fail = this.metricValues(`http_req_failed{endpoint:${ep.endpoint}}`);
       const count = dur ? (dur.count ?? 0) : 0;
       return {
         ...ep,
-        successRate: ep.totalRequests > 0
-          ? parseFloat(((ep.passes / ep.totalRequests) * 100).toFixed(2))
-          : 0,
+        successRate: ep.totalRequests > 0 ? parseFloat(((ep.passes / ep.totalRequests) * 100).toFixed(2)) : 0,
         reqs: count,
         p50: dur ? (dur.med ?? null) : null,
         p95: dur ? (dur['p(95)'] ?? null) : null,
@@ -479,37 +545,37 @@ class K6Reader {
     const budget = this.errorBudget;
     return {
       test_context: {
-        name:             this.testName,
-        run_id:           this.runId,
-        source_ip:        this.sourceIp,
-        vus_max:          this.vusMax,
-        duration:         this.testRunDurationStr,
-        slo_latency_ms:   this.slo.p95Ms,
-        slo_error_rate:   this.slo.errorRate,
+        name: this.testName,
+        run_id: this.runId,
+        source_ip: this.sourceIp,
+        vus_max: this.vusMax,
+        duration: this.testRunDurationStr,
+        slo_latency_ms: this.slo.p95Ms,
+        slo_error_rate: this.slo.errorRate,
       },
       global_metrics: {
-        total_requests:  this.totalRequests,
-        rps:             parseFloat(this.rps.toFixed(2)),
-        duration_p50:    Math.round(this.p50),
-        duration_p90:    Math.round(this.p90),
-        duration_p95:    Math.round(this.p95),
-        duration_p99:    Math.round(this.p99),
-        duration_avg:    Math.round(this.avgDuration),
-        error_rate:      parseFloat(this.errorRate.toFixed(4)),
-        checks_rate:     parseFloat(this.checksRate.toFixed(4)),
-        apdex:           parseFloat(this.apdex.toFixed(3)),
-        slo_passed:      this.sloPass,
-        status:          this.status,
+        total_requests: this.totalRequests,
+        rps: parseFloat(this.rps.toFixed(2)),
+        duration_p50: Math.round(this.p50),
+        duration_p90: Math.round(this.p90),
+        duration_p95: Math.round(this.p95),
+        duration_p99: Math.round(this.p99),
+        duration_avg: Math.round(this.avgDuration),
+        error_rate: parseFloat(this.errorRate.toFixed(4)),
+        checks_rate: parseFloat(this.checksRate.toFixed(4)),
+        apdex: parseFloat(this.apdex.toFixed(3)),
+        slo_passed: this.sloPass,
+        status: this.status,
       },
       latency_breakdown: {
-        ttfb_avg_ms:      Math.round(this.ttfb),
-        ttfb_p95_ms:      Math.round(this.ttfbP95),
-        tls_avg_ms:       Math.round(this.tlsAvg),
-        tls_p95_ms:       Math.round(this.tlsP95),
-        blocked_avg_ms:   Math.round(this.blockedAvg),
-        blocked_p95_ms:   Math.round(this.blockedP95),
+        ttfb_avg_ms: Math.round(this.ttfb),
+        ttfb_p95_ms: Math.round(this.ttfbP95),
+        tls_avg_ms: Math.round(this.tlsAvg),
+        tls_p95_ms: Math.round(this.tlsP95),
+        blocked_avg_ms: Math.round(this.blockedAvg),
+        blocked_p95_ms: Math.round(this.blockedP95),
         connecting_avg_ms: Math.round(this.connectingAvg),
-        sending_avg_ms:   Math.round(this.sendingAvg),
+        sending_avg_ms: Math.round(this.sendingAvg),
         receiving_avg_ms: Math.round(this.receivingAvg),
       },
       status_codes: this.statusCodeSummary,
@@ -521,10 +587,10 @@ class K6Reader {
       },
       ip_summary: this.ipSummary,
       error_budget: {
-        consumed_pct:   budget.consumedPct,
-        remaining_pct:  budget.remainingPct,
-        margin_ms:      budget.marginMs,
-        slo_ms:         budget.sloMs,
+        consumed_pct: budget.consumedPct,
+        remaining_pct: budget.remainingPct,
+        margin_ms: budget.marginMs,
+        slo_ms: budget.sloMs,
       },
       endpoints: this.endpointSummary,
     };
@@ -568,20 +634,21 @@ function resolveTargetJson(reportsDir, arg) {
 
   // 1. Directo en reports/
   fs.readdirSync(reportsDir)
-    .filter(f => f.endsWith('.json') && !excluded.some(x => f.includes(x)))
-    .forEach(f => candidates.push(path.join(reportsDir, f)));
+    .filter((f) => f.endsWith('.json') && !excluded.some((x) => f.includes(x)))
+    .forEach((f) => candidates.push(path.join(reportsDir, f)));
 
   // 2. En subcarpetas que contengan RUN_ (prioridad: más reciente primero)
   fs.readdirSync(reportsDir)
-    .filter(f => f.includes('RUN_'))
-    .sort().reverse()  // más reciente primero por nombre
-    .slice(0, 5)       // solo los últimos 5 runs
-    .forEach(runDir => {
+    .filter((f) => f.includes('RUN_'))
+    .sort()
+    .reverse() // más reciente primero por nombre
+    .slice(0, 5) // solo los últimos 5 runs
+    .forEach((runDir) => {
       const dir = path.join(reportsDir, runDir);
       if (fs.statSync(dir).isDirectory()) {
         fs.readdirSync(dir)
-          .filter(f => f.endsWith('.json') && !excluded.some(x => f.includes(x)))
-          .forEach(f => candidates.push(path.join(dir, f)));
+          .filter((f) => f.endsWith('.json') && !excluded.some((x) => f.includes(x)))
+          .forEach((f) => candidates.push(path.join(dir, f)));
       }
     });
 

@@ -12,19 +12,18 @@
 // ============================================================
 
 export const thresholds = {
-
   // ----------------------------------------------------------
   // SMOKE - Validacion basica de humo. Debe pasar SIEMPRE.
   // Objetivo: detectar errores triviales antes de cargar.
   // ----------------------------------------------------------
   smoke: {
-    'http_req_duration':                              ['p(95)<1500'],
-    'http_req_duration{endpoint:carnet_consulta}':    ['p(95)<1500'],
-    'http_req_duration{endpoint:grados_consulta}':    ['p(95)<1500'],
-    'http_req_failed':                               ['rate<0.01'],
-    'http_req_failed{endpoint:carnet_consulta}':      ['rate<0.01'],
-    'http_req_failed{endpoint:grados_consulta}':      ['rate<0.01'],
-    'checks':                                        ['rate>0.99'],
+    http_req_duration: ['p(95)<1500'],
+    'http_req_duration{endpoint:carnet_consulta}': ['p(95)<1500'],
+    'http_req_duration{endpoint:grados_consulta}': ['p(95)<1500'],
+    http_req_failed: ['rate<0.01'],
+    'http_req_failed{endpoint:carnet_consulta}': ['rate<0.01'],
+    'http_req_failed{endpoint:grados_consulta}': ['rate<0.01'],
+    checks: ['rate>0.99'],
   },
 
   // ----------------------------------------------------------
@@ -32,30 +31,30 @@ export const thresholds = {
   // ISO 25010: el sistema debe sostener esta carga sin degradar.
   // ----------------------------------------------------------
   load: {
-    'http_req_duration':                              ['p(95)<800', 'p(99)<1500', 'avg<500'],
-    'http_req_duration{endpoint:carnet_consulta}':    ['p(95)<800'],
-    'http_req_duration{endpoint:grados_consulta}':    ['p(95)<800'],
-    'http_req_duration{expected:true}':               ['p(95)<800'],
-    'http_req_failed':                               ['rate<0.01'],
-    'http_req_failed{endpoint:carnet_consulta}':      ['rate<0.01'],
-    'http_req_failed{endpoint:grados_consulta}':      ['rate<0.01'],
-    'http_req_waiting':                              ['p(95)<700'],
-    'checks':                                        ['rate>0.99'],
-    'rate_limited_requests':                         ['count<5'],
-    'iteration_duration':                            ['p(95)<5000'],
+    http_req_duration: ['p(95)<800', 'p(99)<1500', 'avg<500'],
+    'http_req_duration{endpoint:carnet_consulta}': ['p(95)<800'],
+    'http_req_duration{endpoint:grados_consulta}': ['p(95)<800'],
+    'http_req_duration{expected:true}': ['p(95)<800'],
+    http_req_failed: ['rate<0.01'],
+    'http_req_failed{endpoint:carnet_consulta}': ['rate<0.01'],
+    'http_req_failed{endpoint:grados_consulta}': ['rate<0.01'],
+    http_req_waiting: ['p(95)<700'],
+    checks: ['rate>0.99'],
+    rate_limited_requests: ['count<5'],
+    iteration_duration: ['p(95)<5000'],
   },
 
   // ----------------------------------------------------------
   // STRESS - Mas alla del nominal. Se ESPERA degradacion controlada.
   // ----------------------------------------------------------
   stress: {
-    'http_req_duration':                              ['p(95)<2000', 'p(99)<5000'],
-    'http_req_duration{endpoint:carnet_consulta}':    ['p(95)<2000'],
-    'http_req_duration{endpoint:grados_consulta}':    ['p(95)<2000'],
-    'http_req_failed':                               ['rate<0.10'],
-    'http_req_failed{endpoint:carnet_consulta}':      ['rate<0.10'],
-    'http_req_failed{endpoint:grados_consulta}':      ['rate<0.10'],
-    'checks':                                        ['rate>0.90'],
+    http_req_duration: ['p(95)<2000', 'p(99)<5000'],
+    'http_req_duration{endpoint:carnet_consulta}': ['p(95)<2000'],
+    'http_req_duration{endpoint:grados_consulta}': ['p(95)<2000'],
+    http_req_failed: ['rate<0.10'],
+    'http_req_failed{endpoint:carnet_consulta}': ['rate<0.10'],
+    'http_req_failed{endpoint:grados_consulta}': ['rate<0.10'],
+    checks: ['rate>0.90'],
   },
 
   // ----------------------------------------------------------
@@ -63,18 +62,18 @@ export const thresholds = {
   // Los thresholds aqui son "abortOnFail: false" para no cortar.
   // ----------------------------------------------------------
   breakpoint: {
-    'http_req_duration': [{ threshold: 'p(95)<3000', abortOnFail: false }],
-    'http_req_failed':   [{ threshold: 'rate<0.25',  abortOnFail: false }],
-    'checks':            [{ threshold: 'rate>0.80',  abortOnFail: false }],
+    http_req_duration: [{ threshold: 'p(95)<3000', abortOnFail: false }],
+    http_req_failed: [{ threshold: 'rate<0.25', abortOnFail: false }],
+    checks: [{ threshold: 'rate>0.80', abortOnFail: false }],
   },
 
   // ----------------------------------------------------------
   // SPIKE - Pico repentino (Black Friday, viralizacion, ataque).
   // ----------------------------------------------------------
   spike: {
-    'http_req_duration': ['p(95)<3000'],
-    'http_req_failed':   ['rate<0.15'],
-    'checks':            ['rate>0.85'],
+    http_req_duration: ['p(95)<3000'],
+    http_req_failed: ['rate<0.15'],
+    checks: ['rate>0.85'],
   },
 };
 

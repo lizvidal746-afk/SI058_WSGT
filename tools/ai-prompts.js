@@ -1,5 +1,3 @@
-'use strict';
-
 function buildUserPrompt(metrics) {
   const gm = metrics.global_metrics || {};
   const tc = metrics.test_context || {};
@@ -55,13 +53,13 @@ Contadores:
 - timeout errors: ${counters.timeout_errors}
 
 Status codes:
-${statusCodes.map(s => `- HTTP ${s.status}: ${s.count}`).join('\n') || '- Sin desglose de status'}
+${statusCodes.map((s) => `- HTTP ${s.status}: ${s.count}`).join('\n') || '- Sin desglose de status'}
 
 Endpoints:
-${endpoints.map(ep => `- ${ep.endpoint}: reqs=${ep.reqs || ep.totalRequests}, p95=${Math.round(ep.p95 || 0)}ms, p99=${Math.round(ep.p99 || 0)}ms, error_rate=${((ep.errorRate || 0) * 100).toFixed(2)}%, checks=${ep.successRate}%`).join('\n') || '- Sin endpoints'}
+${endpoints.map((ep) => `- ${ep.endpoint}: reqs=${ep.reqs || ep.totalRequests}, p95=${Math.round(ep.p95 || 0)}ms, p99=${Math.round(ep.p99 || 0)}ms, error_rate=${((ep.errorRate || 0) * 100).toFixed(2)}%, checks=${ep.successRate}%`).join('\n') || '- Sin endpoints'}
 
 Resumen por IP:
-${ips.map(ip => `- ${ip.ip}: reqs=${ip.requests}, p95=${ip.p95}ms, p99=${ip.p99}ms, error_rate=${(ip.error_rate * 100).toFixed(2)}%, ttfb=${ip.ttfb_avg}ms`).join('\n') || '- Sin métricas por IP'}`;
+${ips.map((ip) => `- ${ip.ip}: reqs=${ip.requests}, p95=${ip.p95}ms, p99=${ip.p99}ms, error_rate=${(ip.error_rate * 100).toFixed(2)}%, ttfb=${ip.ttfb_avg}ms`).join('\n') || '- Sin métricas por IP'}`;
 }
 
 const systemPrompt = `Eres un equipo senior de performance engineering para SUNEDU SI058.
@@ -115,16 +113,17 @@ function buildFallback(metrics) {
   const eb = metrics.error_budget || {};
   const endpoints = metrics.endpoints || [];
   const counters = metrics.custom_counters || {};
-  const status = gm.slo_passed && (gm.apdex || 0) >= 0.9 ? 'Aprobado' : (gm.duration_p95 || 0) < 1800 ? 'Degradado' : 'Rechazado';
+  const status =
+    gm.slo_passed && (gm.apdex || 0) >= 0.9 ? 'Aprobado' : (gm.duration_p95 || 0) < 1800 ? 'Degradado' : 'Rechazado';
   const decision = status === 'Aprobado' ? 'GO' : status === 'Degradado' ? 'GO_CON_RIESGO' : 'NO_GO';
-  const hasCarnet = endpoints.some(e => e.endpoint === 'carnet_consulta');
-  const hasGrados = endpoints.some(e => e.endpoint === 'grados_consulta');
+  const hasCarnet = endpoints.some((e) => e.endpoint === 'carnet_consulta');
+  const hasGrados = endpoints.some((e) => e.endpoint === 'grados_consulta');
   const endpointMasDegradado = (() => {
-    const carnet = endpoints.find(e => e.endpoint === 'carnet_consulta');
-    const grados = endpoints.find(e => e.endpoint === 'grados_consulta');
+    const carnet = endpoints.find((e) => e.endpoint === 'carnet_consulta');
+    const grados = endpoints.find((e) => e.endpoint === 'grados_consulta');
     if (!carnet || !grados) return 'no_disponible';
-    const cScore = (carnet.p95 || 0) + ((carnet.errorRate || 0) * 10000);
-    const gScore = (grados.p95 || 0) + ((grados.errorRate || 0) * 10000);
+    const cScore = (carnet.p95 || 0) + (carnet.errorRate || 0) * 10000;
+    const gScore = (grados.p95 || 0) + (grados.errorRate || 0) * 10000;
     if (Math.abs(cScore - gScore) < 50) return 'empate';
     return cScore > gScore ? 'carnet' : 'grados';
   })();
@@ -138,40 +137,86 @@ function buildFallback(metrics) {
     analisis_ejecutivo: {
       conclusion: `El run ${metrics.test_context?.name} registra p95=${gm.duration_p95}ms, error_rate=${((gm.error_rate || 0) * 100).toFixed(2)}% y APDEX=${gm.apdex}. Estado heuristico: ${status}.`,
       riesgos: [
-        counters.rate_limited_requests > 0 ? 'Se observaron eventos 429/rate limit.' : 'No hay evidencia agregada de 429 en contadores custom.',
+        counters.rate_limited_requests > 0
+          ? 'Se observaron eventos 429/rate limit.'
+          : 'No hay evidencia agregada de 429 en contadores custom.',
         counters.timeout_errors > 0 ? 'Se observaron timeouts.' : 'No hay timeouts agregados en contadores custom.',
       ],
       decision_go_no_go: decision,
-      proximos_pasos: decision === 'GO' ? ['Ejecutar el siguiente nivel de carga controlado.', 'Monitorear p95, p99, 5xx y TTFB.'] : ['Revisar errores y TTFB antes de escalar.', 'Repetir baseline despues de correcciones.'],
+      proximos_pasos:
+        decision === 'GO'
+          ? ['Ejecutar el siguiente nivel de carga controlado.', 'Monitorear p95, p99, 5xx y TTFB.']
+          : ['Revisar errores y TTFB antes de escalar.', 'Repetir baseline despues de correcciones.'],
     },
     analisis_tecnico_profundo: {
       cuello_probable: (metrics.latency_breakdown?.ttfb_avg_ms || 0) > 500 ? 'backend' : 'indeterminado',
       hipotesis_priorizadas: [
-        { hipotesis: 'Backend/BD como posible contribuyente si TTFB crece con VUs.', evidencia: `TTFB avg=${metrics.latency_breakdown?.ttfb_avg_ms}ms, p95=${metrics.latency_breakdown?.ttfb_p95_ms}ms.`, prioridad: 'media' },
-        { hipotesis: 'WAF/rate limit si aparecen 429.', evidencia: `rate_limited_requests=${counters.rate_limited_requests}.`, prioridad: counters.rate_limited_requests > 0 ? 'alta' : 'baja' },
+        {
+          hipotesis: 'Backend/BD como posible contribuyente si TTFB crece con VUs.',
+          evidencia: `TTFB avg=${metrics.latency_breakdown?.ttfb_avg_ms}ms, p95=${metrics.latency_breakdown?.ttfb_p95_ms}ms.`,
+          prioridad: 'media',
+        },
+        {
+          hipotesis: 'WAF/rate limit si aparecen 429.',
+          evidencia: `rate_limited_requests=${counters.rate_limited_requests}.`,
+          prioridad: counters.rate_limited_requests > 0 ? 'alta' : 'baja',
+        },
       ],
-      metricas_clave: [`p95=${gm.duration_p95}ms`, `p99=${gm.duration_p99}ms`, `error_rate=${((gm.error_rate || 0) * 100).toFixed(2)}%`, `APDEX=${gm.apdex}`, `budget_restante=${eb.remaining_pct}%`],
-      acciones_recomendadas: ['Cruzar resultado con logs de API/gateway/BD.', 'Comparar por endpoint e IP antes de concluir causa raiz.'],
+      metricas_clave: [
+        `p95=${gm.duration_p95}ms`,
+        `p99=${gm.duration_p99}ms`,
+        `error_rate=${((gm.error_rate || 0) * 100).toFixed(2)}%`,
+        `APDEX=${gm.apdex}`,
+        `budget_restante=${eb.remaining_pct}%`,
+      ],
+      acciones_recomendadas: [
+        'Cruzar resultado con logs de API/gateway/BD.',
+        'Comparar por endpoint e IP antes de concluir causa raiz.',
+      ],
     },
     revision_collapse: {
-      aplica: String(metrics.test_context?.name || '').toLowerCase().includes('collapse'),
+      aplica: String(metrics.test_context?.name || '')
+        .toLowerCase()
+        .includes('collapse'),
       aprobacion_requerida: true,
       precondiciones_faltantes: ['Confirmar ventana autorizada.', 'Confirmar monitoreo backend y plan de abortar.'],
       criterios_abort: ['5xx sostenidos > 60s.', 'CPU/BD saturada sin recuperacion.', 'Impacto fuera de QA.'],
       evidencia_esperada: ['JSON k6.', 'HTML.', 'Excel/Word.', 'Logs gateway/API/BD.', 'Tiempo de recuperacion.'],
     },
     mejora_plan_pruebas: {
-      cobertura_faltante: ['Soak/endurance si no se ejecuto.', 'Spike si no se ejecuto.', 'Carga mixta realista si solo hay endpoints aislados.'],
-      duplicidades_o_riesgos: ['No confundir cp03 con collapse: tienen objetivos distintos.', 'No aplicar thresholds de smoke a pruebas destructivas.'],
-      orden_recomendado: ['smoke', 'audit multi-IP', 'baseline/load', 'stress', 'spike', 'soak', 'WAF', 'cp03', 'collapse'],
+      cobertura_faltante: [
+        'Soak/endurance si no se ejecuto.',
+        'Spike si no se ejecuto.',
+        'Carga mixta realista si solo hay endpoints aislados.',
+      ],
+      duplicidades_o_riesgos: [
+        'No confundir cp03 con collapse: tienen objetivos distintos.',
+        'No aplicar thresholds de smoke a pruebas destructivas.',
+      ],
+      orden_recomendado: [
+        'smoke',
+        'audit multi-IP',
+        'baseline/load',
+        'stress',
+        'spike',
+        'soak',
+        'WAF',
+        'cp03',
+        'collapse',
+      ],
       casos_con_aprobacion_formal: ['cp01 WAF', 'cp03 saturacion', 'collapse'],
     },
     comparacion_carnet_grados: {
       disponible: hasCarnet && hasGrados,
       endpoint_mas_degradado: endpointMasDegradado,
-      evidencia: endpoints.map(e => `${e.endpoint}: p95=${Math.round(e.p95 || 0)}ms, error_rate=${((e.errorRate || 0) * 100).toFixed(2)}%`),
+      evidencia: endpoints.map(
+        (e) => `${e.endpoint}: p95=${Math.round(e.p95 || 0)}ms, error_rate=${((e.errorRate || 0) * 100).toFixed(2)}%`,
+      ),
     },
-    recomendacion_prioritaria: decision === 'GO' ? 'Escalar ordenadamente al siguiente escenario con monitoreo backend.' : 'Corregir o explicar degradacion antes de aumentar carga.',
+    recomendacion_prioritaria:
+      decision === 'GO'
+        ? 'Escalar ordenadamente al siguiente escenario con monitoreo backend.'
+        : 'Corregir o explicar degradacion antes de aumentar carga.',
   };
 }
 

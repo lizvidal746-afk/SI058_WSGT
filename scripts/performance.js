@@ -6,11 +6,11 @@
 // ============================================================
 
 import { sleep } from 'k6';
-import { consultaCarnet }       from '../lib/requests/carnet.js';
-import { consultaGrados }       from '../lib/requests/grados.js';
-import { solicitarRecuperacion } from '../lib/requests/clienteResetToken.js';
-import { getCarnetUser, getGradosUser, getResetUser } from '../lib/users.js';
 import { buildK6Options, getThinkTime } from '../lib/options-builder.js';
+import { consultaCarnet } from '../lib/requests/carnet.js';
+import { solicitarRecuperacion } from '../lib/requests/clienteResetToken.js';
+import { consultaGrados } from '../lib/requests/grados.js';
+import { getCarnetUser, getGradosUser, getResetUser } from '../lib/users.js';
 
 // 1. OBTENER CONFIGURACIÓN CENTRALIZADA
 const { options: baseOptions, SCENARIO_NAME, handleSummary: summaryHandler } = buildK6Options('perf');
@@ -24,14 +24,11 @@ export default function () {
 
   if (FOCUS === 'carnet') {
     consultaCarnet(getCarnetUser());
-  } 
-  else if (FOCUS === 'grados') {
+  } else if (FOCUS === 'grados') {
     consultaGrados(getGradosUser());
-  } 
-  else if (FOCUS === 'reset') {
+  } else if (FOCUS === 'reset') {
     solicitarRecuperacion(getResetUser());
-  } 
-  else {
+  } else {
     if (Math.random() < carnetRatio) {
       consultaCarnet(getCarnetUser());
     } else {
@@ -46,7 +43,7 @@ export default function () {
 }
 
 // 3. REPORTE FINAL Y CIERRE (TEARDOWN)
-export function teardown(data) {
+export function teardown(_data) {
   console.log(`[TEARDOWN] Finalizando prueba SI058 - Escenario: ${SCENARIO_NAME}`);
   console.log(`[INFO] Las sesiones y sockets han sido cerrados. Validar limpieza de tokens en BD si aplica.`);
 }

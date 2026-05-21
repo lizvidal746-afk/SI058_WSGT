@@ -1420,7 +1420,7 @@ function closeModal() {
   currentPrompt = null;
 }
 
-function copyPrompt() {
+function _copyPrompt() {
   if (!currentPrompt) return;
   navigator.clipboard.writeText(currentPrompt.prompt).then(() => {
     const btn = document.getElementById('copyMainBtn');
@@ -1442,11 +1442,11 @@ function escapeHtml(str) {
 function updateCounts() {
   const cats = ['framework','analisis','codigo','thresholds','debug','collapse'];
   cats.forEach(c => {
-    const el = document.getElementById('cnt-' + c);
+    const el = document.getElementById(`cnt-${c}`);
     if (el) el.textContent = PROMPTS.filter(p => p.category === c).length;
   });
   document.getElementById('cnt-all').textContent = PROMPTS.length;
-  document.getElementById('totalBadge').textContent = PROMPTS.length + ' prompts';
+  document.getElementById('totalBadge').textContent = `${PROMPTS.length} prompts`;
 }
 
 document.querySelectorAll('.sidebar-btn[data-cat]').forEach(btn => {
@@ -1456,7 +1456,7 @@ document.querySelectorAll('.sidebar-btn[data-cat]').forEach(btn => {
     activeFilter = { cat: btn.dataset.cat, level: null, mode: null };
     renderCards();
     const title = btn.dataset.cat === 'all' ? 'Todos los prompts' : CAT_LABELS[btn.dataset.cat];
-    document.getElementById('sectionTitle').childNodes[0].textContent = title + ' ';
+    document.getElementById('sectionTitle').childNodes[0].textContent = `${title} `;
   });
 });
 

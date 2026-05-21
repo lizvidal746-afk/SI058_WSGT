@@ -6,9 +6,9 @@
 // ============================================================
 
 import { sleep } from 'k6';
-import { consultaCarnet } from '../lib/requests/carnet.js';
-import { getCarnetUser }  from '../lib/users.js';
 import { buildK6Options, getThinkTime } from '../lib/options-builder.js';
+import { consultaCarnet } from '../lib/requests/carnet.js';
+import { getCarnetUser } from '../lib/users.js';
 
 // 1. OBTENER CONFIGURACIÓN CENTRALIZADA
 const { options: baseOptions, SCENARIO_NAME, handleSummary: summaryHandler } = buildK6Options('carnet');
