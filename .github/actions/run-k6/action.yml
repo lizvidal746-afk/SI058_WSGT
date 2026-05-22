@@ -5,17 +5,31 @@ inputs:
     description: "Path to the k6 script (JS)"
     required: true
   result_name:
-    description: "Base name for generated artifacts"
-    required: true
+    description: "Base name for generated artifacts (optional)"
+    required: false
+    default: ""
+outputs:
+  result_name:
+    description: "Effective result name used for artifacts"
 runs:
   using: "composite"
   steps:
+    - name: Determine result name
+      id: namecalc
+      shell: pwsh
+      run: |
+        if ([string]::IsNullOrWhiteSpace('${{ inputs.result_name }}')) {
+          $base = [System.IO.Path]::GetFileNameWithoutExtension('${{ inputs.script }}')
+          echo "::set-output name=result_name::$base"
+        } else {
+          echo "::set-output name=result_name::${{ inputs.result_name }}"
+        }
     - name: Execute PowerShell runner
       shell: pwsh
       run: |
-        .\tools\run-k6.ps1 -Script ${{ inputs.script }} -ResultPrefix ${{ inputs.result_name }}
+        .\\tools\\run‑k6.ps1 -Script ${{ inputs.script }} -ResultPrefix ${{ steps.namecalc.outputs.result_name }}
     - name: Upload generated artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.result_name }}-artifacts
-        path: reports/${{ inputs.result_name }}-*.{html,xlsx,docx}
+        name: ${{ steps.namecalc.outputs.result_name }}-artifacts
+        path: reports/${{ steps.namecalc.outputs.result_name }}-*.{html,xlsx,docx}
