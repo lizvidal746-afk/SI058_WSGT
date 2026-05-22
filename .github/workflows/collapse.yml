@@ -1,0 +1,48 @@
+// .github/workflows/collapse.yml
+name: 📊 Collapse Processing
+
+on:
+  workflow_call:
+    inputs: {}
+    secrets: inherit
+
+jobs:
+  run-collapse:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        scenario: [grados, carnet]
+    env:
+      BASE_URL: ${{ secrets.SUNEDU_WSGT_BASE_URL }}
+      SUNEDU_WSGT_GRADOS_ENDPOINT: ${{ secrets.SUNEDU_WSGT_GRADOS_ENDPOINT }}
+      SUNEDU_WSGT_CARNET_ENDPOINT: ${{ secrets.SUNEDU_WSGT_CARNET_ENDPOINT }}
+      OLLAMA_ENDPOINT: ${{ secrets.OLLAMA_ENDPOINT }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install k6 (Chocolatey)
+        run: choco install k6 -y
+
+      - name: Run collapse via composite action
+        uses: ./.github/actions/run-k6
+        with:
+          script: scripts/${{ matrix.scenario }}-collapse.js
+
+      - name: Publish collapse artifacts via composite action
+        uses: ./.github/actions/publish-artifacts
+        with:
+          name: collapse-${{ matrix.scenario }}
+          path: |
+            reports/**/*.html
+            *.xlsx
+            *.docx
+            metrics_for_ai.json
