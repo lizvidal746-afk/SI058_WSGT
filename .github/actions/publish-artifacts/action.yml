@@ -1,0 +1,30 @@
+name: "Publish Audit Artifacts"
+description: "Uploads reports and creates SHA‑256 checksums for audit integrity"
+inputs:
+  name:
+    description: "Base name for the artifact"
+    required: true
+  path:
+    description: "Glob pattern for files to upload"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Generate SHA‑256 checksums
+      shell: pwsh
+      run: |
+        $files = Get-ChildItem -Path ${{ inputs.path }} -Recurse -File
+        $checksums = ""
+        foreach ($f in $files) {
+          $hash = Get-FileHash -Algorithm SHA256 -Path $f.FullName
+          $checksums += "$($f.Name)  $($hash.Hash)" + "`n"
+        }
+        $checksums | Set-Content -Path checksums.txt -Encoding UTF8
+    - name: Upload artifacts and checksum
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.name }}
+        path: |
+          ${{ inputs.path }}
+          checksums.txt
+        retention-days: 30

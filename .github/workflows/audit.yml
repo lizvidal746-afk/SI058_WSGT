@@ -2,9 +2,9 @@
 name: 📊 Performance Audits
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *'   # optional daily run
+  workflow_call:
+    inputs: {}
+    secrets: inherit
 
 jobs:
   run-audit:
@@ -24,7 +24,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
@@ -32,13 +32,10 @@ jobs:
       - name: Install k6 (Chocolatey)
         run: choco install k6 -y
 
-      - name: Run k6 audit
-        shell: pwsh
-        run: |
-          $env:BASE_URL = $env:BASE_URL
-          Write-Host "[run‑k6] BASE_URL = $env:BASE_URL"
-          Write-Host "[run‑k6] OLLAMA_ENDPOINT = $env:OLLAMA_ENDPOINT"
-          .\tools\run-k6.ps1 scripts\${{ matrix.scenario }}.js
+      - name: Run k6 audit via composite action
+        uses: ./.github/actions/run-k6
+        with:
+          script: scripts/${{ matrix.scenario }}.js
 
       - name: Extract metrics
         run: node extract-k6-metrics.js
@@ -49,8 +46,8 @@ jobs:
       - name: Generate Word report
         run: node generar-word.js
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Publish artifacts via composite action
+        uses: ./.github/actions/publish-artifacts
         with:
           name: audit-${{ matrix.scenario }}
           path: |

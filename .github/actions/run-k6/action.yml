@@ -1,0 +1,21 @@
+name: "Run k6 Load Test"
+description: "Executes run‑k6.ps1 with the given script and uploads generated reports."
+inputs:
+  script:
+    description: "Path to the k6 script (JS)"
+    required: true
+  result_name:
+    description: "Base name for generated artifacts"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Execute PowerShell runner
+      shell: pwsh
+      run: |
+        .\tools\run-k6.ps1 -Script ${{ inputs.script }} -ResultPrefix ${{ inputs.result_name }}
+    - name: Upload generated artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.result_name }}-artifacts
+        path: reports/${{ inputs.result_name }}-*.{html,xlsx,docx}
