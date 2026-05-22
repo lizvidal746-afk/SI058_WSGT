@@ -41,7 +41,9 @@ Get-Content $envFile | ForEach-Object {
     }
 }
 
-Write-Host "[run-k6] .env cargado." -ForegroundColor Cyan
+# Log base URL and Ollama endpoint for debugging
+Write-Host "[run-k6] BASE_URL      : $env:BASE_URL" -ForegroundColor Cyan
+Write-Host "[run-k6] OLLAMA_ENDPOINT: $env:OLLAMA_ENDPOINT" -ForegroundColor Cyan
 
 # Detectar IP real del host, priorizando la subred 192.168.28.x (misma que K6_LOCAL_IPS)
 # y excluyendo adaptadores virtuales (WSL 172.17.x.x, Hyper-V, Docker 172.16-31.x.x)

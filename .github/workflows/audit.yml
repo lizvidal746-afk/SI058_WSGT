@@ -1,0 +1,60 @@
+// .github/workflows/audit.yml
+name: 📊 Performance Audits
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'   # optional daily run
+
+jobs:
+  run-audit:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        scenario: [grados, carnet]
+    env:
+      BASE_URL: ${{ secrets.SUNEDU_WSGT_BASE_URL }}
+      SUNEDU_WSGT_GRADOS_ENDPOINT: ${{ secrets.SUNEDU_WSGT_GRADOS_ENDPOINT }}
+      SUNEDU_WSGT_CARNET_ENDPOINT: ${{ secrets.SUNEDU_WSGT_CARNET_ENDPOINT }}
+      OLLAMA_ENDPOINT: ${{ secrets.OLLAMA_ENDPOINT }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install k6 (Chocolatey)
+        run: choco install k6 -y
+
+      - name: Run k6 audit
+        shell: pwsh
+        run: |
+          $env:BASE_URL = $env:BASE_URL
+          Write-Host "[run‑k6] BASE_URL = $env:BASE_URL"
+          Write-Host "[run‑k6] OLLAMA_ENDPOINT = $env:OLLAMA_ENDPOINT"
+          .\tools\run-k6.ps1 scripts\${{ matrix.scenario }}.js
+
+      - name: Extract metrics
+        run: node extract-k6-metrics.js
+
+      - name: Generate Excel report
+        run: node generar-excel.js
+
+      - name: Generate Word report
+        run: node generar-word.js
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-${{ matrix.scenario }}
+          path: |
+            reports/**/*.html
+            *.xlsx
+            *.docx
+            metrics_for_ai.json
